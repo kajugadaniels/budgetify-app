@@ -34,6 +34,8 @@ const SignUpPage = () => {
                         footerAction: "text-white/60",
                         socialButtonsBlockButton:
                             "border border-white/10 bg-white/5 text-white hover:bg-white/10",
+                        formFieldInput:
+                            "h-12 border-white/10 bg-[#1f1c18] text-white focus:border-[#c7bfa7] focus:ring-[#c7bfa7]",
                         formButtonPrimary:
                             "bg-[#c7bfa7] text-[#1f1a12] hover:bg-[#b8af95]",
                     },
