@@ -15,7 +15,9 @@ const SignInPage = () => {
                 </p>
             </div>
             <SignIn
-                routing="hash"
+                routing="path"
+                path="/"
+                signUpUrl="/sign-up"
                 appearance={{
                     variables: {
                         colorPrimary: "#c7bfa7",
