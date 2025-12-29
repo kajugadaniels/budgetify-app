@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ClerkProvider } from "@clerk/nextjs";
 import { DM_Sans, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -50,9 +51,11 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en">
-            <body className={`${dmSans.variable} ${geistMono.variable} antialiased dark`}>
-                {children}
-            </body>
+            <ClerkProvider>
+                <body className={`${dmSans.variable} ${geistMono.variable} antialiased dark`}>
+                    {children}
+                </body>
+            </ClerkProvider>
         </html>
     );
 }
