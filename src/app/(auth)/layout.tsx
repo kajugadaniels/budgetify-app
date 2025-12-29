@@ -4,11 +4,11 @@ export default function AuthLayout({
     children,
 }: Readonly<{ children: ReactNode }>) {
     return (
-        <div className="min-h-screen bg-[#12110f] text-[#f5f0e6]">
+        <div className="min-h-screen text-primary">
             <div className="relative min-h-screen overflow-hidden">
-                <div className="pointer-events-none absolute -left-24 top-12 h-64 w-64 rounded-full bg-[radial-gradient(circle,_rgba(199,191,167,0.3)_0%,_rgba(199,191,167,0)_72%)] blur-2xl" />
-                <div className="pointer-events-none absolute -right-32 top-1/2 h-[520px] w-[520px] -translate-y-1/2 rounded-full bg-[radial-gradient(circle,_rgba(199,191,167,0.18)_0%,_rgba(199,191,167,0)_70%)] blur-3xl" />
-                <div className="pointer-events-none absolute bottom-0 left-0 h-40 w-full bg-[linear-gradient(180deg,_rgba(18,17,15,0)_0%,_rgba(18,17,15,1)_100%)]" />
+                <div className="pointer-events-none absolute -left-24 top-12 h-64 w-64 rounded-full bg-[radial-gradient(circle,rgba(199,191,167,0.3)_0%,rgba(199,191,167,0)_72%)] blur-2xl" />
+                <div className="pointer-events-none absolute -right-32 top-1/2 h-130 w-130 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(199,191,167,0.18)_0%,rgba(199,191,167,0)_70%)] blur-3xl" />
+                <div className="pointer-events-none absolute bottom-0 left-0 h-40 w-full bg-[linear-gradient(180deg,rgba(18,17,15,0)_0%,rgba(18,17,15,1)_100%)]" />
 
                 <div className="relative mx-auto flex min-h-screen max-w-6xl flex-col gap-12 px-6 py-12 lg:flex-row lg:items-center">
                     <section className="flex-1 space-y-10">
@@ -46,7 +46,7 @@ export default function AuthLayout({
                             <span>Clerk secured</span>
                         </div>
                     </section>
-                    <section className="flex w-full max-w-xl justify-center lg:w-[420px] lg:justify-end">
+                    <section className="flex w-full max-w-xl justify-center lg:w-118 lg:justify-end">
                         <div className="w-full rounded-[32px] border border-white/10 bg-[#1a1814]/90 p-8 shadow-[0_40px_120px_-60px_rgba(0,0,0,0.8)] backdrop-blur">
                             {children}
                         </div>
