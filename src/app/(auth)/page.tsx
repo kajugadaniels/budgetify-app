@@ -15,9 +15,8 @@ const SignInPage = () => {
                 </p>
             </div>
             <SignIn
-                routing="path"
-                path="/"
-                signUpUrl="/sign-up"
+                routing="hash"
+                signUpUrl="/#/sign-up"
                 appearance={{
                     variables: {
                         colorPrimary: "#c7bfa7",
@@ -36,7 +35,7 @@ const SignInPage = () => {
                         socialButtonsBlockButton:
                             "border border-white/10 bg-white/5 text-white hover:bg-white/10",
                         formButtonPrimary:
-                            "bg-[#c7bfa7] text-[#1f1a12 hover:bg-[#b8af95]",
+                            "bg-[#c7bfa7] text-[#1f1a12] hover:bg-[#b8af95]",
                     },
                 }}
             />
