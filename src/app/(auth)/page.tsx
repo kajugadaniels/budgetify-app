@@ -35,9 +35,9 @@ const SignInPage = () => {
                         socialButtonsBlockButton:
                             "border border-white/10 bg-white/5 text-white hover:bg-white/10",
                         formFieldInput:
-                            "h-12 border-white/10 bg-[#1f1c18] text-white focus:border-[#c7bfa7] focus:ring-[#c7bfa7]",
+                            "h-12 border-white/10 bg-[#1f1c18] text-white focus:border-primary focus:ring-primary",
                         formButtonPrimary:
-                            "bg-[#c7bfa7] text-dark hover:bg-[#b8af95]",
+                            "bg-primary text-dark hover:bg-foreground",
                     },
                 }}
             />
