@@ -51,7 +51,7 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en">
-            <ClerkProvider>
+            <ClerkProvider signInUrl="/" signUpUrl="/sign-up">
                 <body className={`${dmSans.variable} ${geistMono.variable} antialiased dark`}>
                     {children}
                 </body>
