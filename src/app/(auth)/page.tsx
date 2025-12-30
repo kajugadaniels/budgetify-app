@@ -6,11 +6,13 @@ const SignInPage = () => {
     return (
         <div className="space-y-6">
             <div className="space-y-3 text-center">
-                <p className="text-xs uppercase tracking-[0.3em] text-white/50">
+                <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
                     Welcome back
                 </p>
-                <h2 className="text-3xl font-semibold text-white">Sign in to Budgetify</h2>
-                <p className="text-sm text-white/60">
+                <h2 className="text-3xl font-semibold text-foreground">
+                    Sign in to Budgetify
+                </h2>
+                <p className="text-sm text-muted-foreground">
                     Use your Clerk account to continue building a disciplined budget.
                 </p>
             </div>
@@ -19,25 +21,25 @@ const SignInPage = () => {
                 signUpUrl="/sign-up"
                 appearance={{
                     variables: {
-                        colorPrimary: "#c7bfa7",
-                        colorText: "#f5f0e6",
-                        colorBackground: "#1a1814",
-                        colorInputBackground: "#1f1c18",
-                        colorInputText: "#f5f0e6",
+                        colorPrimary: "var(--primary)",
+                        colorText: "var(--foreground)",
+                        colorBackground: "var(--card)",
+                        colorInputBackground: "var(--input)",
+                        colorInputText: "var(--foreground)",
                         borderRadius: "14px",
                         fontFamily: "var(--font-dm-sans)",
                     },
                     elements: {
-                        card: "shadow-none border border-white/10 bg-transparent p-0",
+                        card: "shadow-none border border-border/60 bg-transparent p-0",
                         headerTitle: "hidden",
                         headerSubtitle: "hidden",
-                        footerAction: "text-white/60",
+                        footerAction: "text-muted-foreground",
                         socialButtonsBlockButton:
-                            "border border-white/10 bg-white/5 text-white hover:bg-white/10",
+                            "border border-border/60 bg-muted/40 text-foreground hover:bg-muted/60",
                         formFieldInput:
-                            "h-12 border-white/10 bg-[#1f1c18] text-white focus:border-primary focus:ring-primary",
+                            "h-12 border-border/60 bg-input text-foreground focus:border-primary focus:ring-primary",
                         formButtonPrimary:
-                            "bg-primary text-dark hover:bg-foreground",
+                            "bg-primary text-primary-foreground hover:bg-primary/90",
                     },
                 }}
             />
