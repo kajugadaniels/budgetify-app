@@ -33,11 +33,11 @@ const SignUpPage = () => {
                         headerSubtitle: "hidden",
                         footerAction: "text-muted-foreground",
                         socialButtonsBlockButton:
-                            "border border-border/60 bg-muted/40 text-foreground hover:bg-muted/60",
+                            "border border-border/60 bg-white text-black hover:bg-white/90",
                         formFieldInput:
                             "h-12 border-border/60 bg-input text-foreground focus:border-primary focus:ring-primary",
                         formButtonPrimary:
-                            "bg-primary text-primary-foreground hover:bg-primary/90",
+                            "bg-foreground text-background hover:bg-foreground/90",
                     },
                 }}
             />
