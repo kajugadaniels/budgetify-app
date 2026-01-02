@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
+import { Toaster } from "sonner";
 import { DM_Sans, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -54,6 +55,7 @@ export default function RootLayout({
             <ClerkProvider signInUrl="/" signUpUrl="/sign-up">
                 <body className={`${dmSans.variable} ${geistMono.variable} antialiased dark`}>
                     {children}
+                    <Toaster richColors theme="dark" />
                 </body>
             </ClerkProvider>
         </html>
