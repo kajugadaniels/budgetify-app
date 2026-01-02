@@ -1,10 +1,12 @@
 "use client";
 
 import { SignIn } from "@clerk/nextjs";
+import { AuthSessionHandler } from "@/components/auth/auth-session-handler";
 
 const SignInPage = () => {
     return (
         <div className="space-y-6">
+            <AuthSessionHandler mode="login" />
             <div className="space-y-3 text-center">
                 <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
                     Welcome back
