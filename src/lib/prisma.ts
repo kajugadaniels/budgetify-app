@@ -1,5 +1,5 @@
 // create a prisma instance and cache in development
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@/generated/prisma";
 
 const globalForPrisma = global as unknown as { prisma: PrismaClient };
 
