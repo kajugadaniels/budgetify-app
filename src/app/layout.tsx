@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { DM_Sans, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Providers from "@/providers/Providers";
+import Navbar from "@/components/shared/Navbar";
 
 const dmSans = DM_Sans({
     variable: "--font-dm-sans",
@@ -53,7 +54,8 @@ export default async function RootLayout({
         <html lang="en">
             <body className={`${dmSans.variable} ${geistMono.variable} antialiased dark`}>
                 <Providers>
-                    {children}
+                    <Navbar />
+                    <main className="mx-auto max-w-6xl px-6 py-8">{children}</main>
                 </Providers>
             </body>
         </html>
