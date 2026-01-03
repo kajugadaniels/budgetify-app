@@ -1,6 +1,4 @@
 import type { Metadata } from "next";
-import { ClerkProvider } from "@clerk/nextjs";
-import { Toaster } from "sonner";
 import { DM_Sans, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Providers from "@/providers/Providers";
@@ -57,7 +55,6 @@ export default function RootLayout({
                 <Providers>
                     {children}
                 </Providers>
-                <Toaster richColors theme="dark" />
             </body>
         </html>
     );
