@@ -8,6 +8,8 @@ export default function Providers({ children }: { children: React.ReactNode }) {
     return (
         <TanStackProvider>
             <ClerkProvider
+                signInUrl="/"
+                signUpUrl="/sign-up"
                 appearance={{
                     variables: {
                         colorPrimary: "#e78a53",
