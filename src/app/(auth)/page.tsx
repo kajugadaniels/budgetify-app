@@ -17,7 +17,7 @@ const SignInPage = () => {
                 </p>
             </div>
             <SignIn
-                routing="hash"
+                routing="path"
                 signUpUrl="/sign-up"
                 afterSignInUrl="/dashboard"
                 appearance={{
