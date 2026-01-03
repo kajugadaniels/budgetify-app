@@ -4,6 +4,7 @@ import {
     Receipt,
     Target,
     PieChart,
+    WalletCards,
 } from "lucide-react";
 
 type NavItem = {
@@ -15,6 +16,7 @@ type NavItem = {
 export const NAV_ITEMS: NavItem[] = [
     { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
     { label: "Budgets", href: "/budgets", icon: Wallet },
+    { label: "Income", href: "/income", icon: WalletCards },
     { label: "Transactions", href: "/transactions", icon: Receipt },
     { label: "Goals", href: "/goals", icon: Target },
     { label: "Reports", href: "/reports", icon: PieChart },
