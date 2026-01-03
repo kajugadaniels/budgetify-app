@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { DM_Sans, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Providers from "@/providers/Providers";
+import { syncUser } from "@/lib/actions/user";
 
 const dmSans = DM_Sans({
     variable: "--font-dm-sans",
@@ -44,11 +45,13 @@ export const metadata: Metadata = {
     },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
     children,
 }: Readonly<{
     children: React.ReactNode;
 }>) {
+    await syncUser();
+
     return (
         <html lang="en">
             <body className={`${dmSans.variable} ${geistMono.variable} antialiased dark`}>
