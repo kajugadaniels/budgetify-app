@@ -7,8 +7,8 @@ export default clerkMiddleware((auth, req) => {
     const { userId } = auth();
 
     if (req.nextUrl.pathname === "/" && userId) {
-        const signOutUrl = new URL("/sign-out", req.url);
-        return NextResponse.redirect(signOutUrl);
+        const dashboardUrl = new URL("/dashboard", req.url);
+        return NextResponse.redirect(dashboardUrl);
     }
 
     if (!isPublicRoute(req)) {
