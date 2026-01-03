@@ -1,10 +1,18 @@
+import { redirect } from "next/navigation";
+import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import IncomePageClient, {
     type IncomeRecord,
 } from "@/components/shared/income/IncomePageClient";
 
 export default async function IncomePage() {
+    const { userId } = auth();
+    if (!userId) {
+        redirect("/");
+    }
+
     const incomes = await prisma.income.findMany({
+        where: { userId },
         orderBy: [
             { year: "desc" },
             { month: "desc" },
