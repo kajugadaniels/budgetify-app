@@ -55,7 +55,7 @@ export default async function RootLayout({
             <body className={`${dmSans.variable} ${geistMono.variable} antialiased dark`}>
                 <Providers>
                     <Navbar />
-                    <main className="mx-auto max-w-6xl px-6 py-8">{children}</main>
+                    {children}
                 </Providers>
             </body>
         </html>
