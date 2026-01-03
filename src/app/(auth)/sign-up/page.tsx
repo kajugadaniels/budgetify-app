@@ -1,12 +1,10 @@
 "use client";
 
 import { SignUp } from "@clerk/nextjs";
-import { AuthSessionHandler } from "@/components/auth/auth-session-handler";
 
 const SignUpPage = () => {
     return (
         <div className="space-y-6">
-            <AuthSessionHandler mode="register" />
             <div className="space-y-3 text-center">
                 <p className="text-xs uppercase tracking-[0.3em] text-white/50">
                     Get started
@@ -19,6 +17,7 @@ const SignUpPage = () => {
             <SignUp
                 routing="hash"
                 signInUrl="/"
+                afterSignUpUrl="/dashboard"
                 appearance={{
                     variables: {
                         colorPrimary: "var(--primary)",
