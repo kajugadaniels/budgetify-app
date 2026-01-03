@@ -1,16 +1,13 @@
-import { auth } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
-import { syncUser } from "@/lib/actions/user";
+import Navbar from '@/components/shared/Navbar'
+import React from 'react'
 
-export default async function Dashboard() {
-    const { userId } = auth();
-    if (!userId) {
-        redirect("/");
-    }
-
-    await syncUser();
-
+const DashboardPage = () => {
     return (
-        <div className="min-h-screen bg-background">Dashboard here</div>
-    );
+        <div>
+            <Navbar />
+            Dashboard
+        </div>
+    )
 }
+
+export default DashboardPage
