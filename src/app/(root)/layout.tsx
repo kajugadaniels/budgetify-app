@@ -1,6 +1,4 @@
 import { ReactNode } from "react";
-import { auth } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
 import Navbar from "@/components/shared/Navbar";
 import { syncUser } from "@/lib/actions/user";
 
@@ -9,11 +7,6 @@ export default async function RootAreaLayout({
 }: {
     children: ReactNode;
 }) {
-    const { userId } = auth();
-    if (!userId) {
-        redirect("/");
-    }
-
     await syncUser();
 
     return (
