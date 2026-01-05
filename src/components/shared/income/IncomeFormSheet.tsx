@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { CalendarDays, Sparkles, Wallet2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import IncomeForm from "./IncomeForm";
@@ -17,10 +17,18 @@ type IncomeFormSheetProps = {
     mode: "create" | "edit";
     income: IncomeRecord | null;
     onClose: () => void;
-    onSubmit: (values: IncomeFormValues) => void;
+    onSubmit: (values: IncomeFormValues) => Promise<void>;
 };
 
-const IncomeFormSheet = ({ open, mode, income, onClose, onSubmit }: IncomeFormSheetProps) => {
+const IncomeFormSheet = ({
+    open,
+    mode,
+    income,
+    onClose,
+    onSubmit,
+}: IncomeFormSheetProps) => {
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
     const initialValues = useMemo<IncomeFormValues>(() => {
         if (!income) return defaultIncomeFormValues();
 
@@ -52,6 +60,16 @@ const IncomeFormSheet = ({ open, mode, income, onClose, onSubmit }: IncomeFormSh
     if (!open) return null;
 
     const isCreate = mode === "create";
+
+    const handleSubmit = async (values: IncomeFormValues) => {
+        if (isSubmitting) return;
+        setIsSubmitting(true);
+        try {
+            await onSubmit(values);
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
 
     return (
         <div
@@ -129,7 +147,8 @@ const IncomeFormSheet = ({ open, mode, income, onClose, onSubmit }: IncomeFormSh
                     <IncomeForm
                         mode={mode}
                         initialValues={initialValues}
-                        onSubmit={onSubmit}
+                        onSubmit={handleSubmit}
+                        isSubmitting={isSubmitting}
                         onCancel={onClose}
                         className="flex-1"
                     />
