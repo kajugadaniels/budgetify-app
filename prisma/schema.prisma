@@ -35,7 +35,8 @@ model Income {
   category   String
   recurrence IncomeRecurrence @default(RECURRING)
   cadence    String
-  nextPayout DateTime
+  paidOn     DateTime
+  nextPayout DateTime?
   amount     Decimal          @db.Decimal(18, 2)
   note       String?
   account    String?
