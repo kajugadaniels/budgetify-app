@@ -1,11 +1,5 @@
-import React from 'react'
+import BudgetPageClient from "@/components/shared/budgets/BudgetPageClient";
 
-const BudgetPage = () => {
-    return (
-        <div>
-            Budget Page
-        </div>
-    )
+export default function BudgetPage() {
+    return <BudgetPageClient />;
 }
-
-export default BudgetPage
