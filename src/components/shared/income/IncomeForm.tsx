@@ -6,18 +6,26 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { IncomeFormValues, defaultIncomeFormValues } from "./types";
+import { cn } from "@/lib/utils";
 
 type IncomeFormProps = {
     mode: "create" | "edit";
     initialValues?: IncomeFormValues;
     onSubmit: (values: IncomeFormValues) => void;
     onCancel: () => void;
+    className?: string;
 };
 
 const categoryOptions = ["Salary", "Consulting", "Investments", "Bonus", "Other"];
 const recurrenceOptions: IncomeFormValues["recurrence"][] = ["Recurring", "One-time"];
 
-const IncomeForm = ({ mode, initialValues, onSubmit, onCancel }: IncomeFormProps) => {
+const IncomeForm = ({
+    mode,
+    initialValues,
+    onSubmit,
+    onCancel,
+    className,
+}: IncomeFormProps) => {
     const [values, setValues] = useState<IncomeFormValues>(
         initialValues ?? defaultIncomeFormValues()
     );
@@ -55,13 +63,14 @@ const IncomeForm = ({ mode, initialValues, onSubmit, onCancel }: IncomeFormProps
     };
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-5">
-            <div className="grid gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                    <Label className="text-xs uppercase tracking-[0.2em] text-muted-foreground" htmlFor="source">
-                        Source
-                    </Label>
-                    <Input
+        <form onSubmit={handleSubmit} className={cn("flex h-full flex-col", className)}>
+            <div className="flex-1 space-y-5 overflow-y-auto pr-1">
+                <div className="grid gap-4 md:grid-cols-2">
+                    <div className="space-y-2">
+                        <Label className="text-xs uppercase tracking-[0.2em] text-muted-foreground" htmlFor="source">
+                            Source
+                        </Label>
+                        <Input
                         id="source"
                         name="source"
                         className="h-11 rounded-xl border-border/60 bg-background/70"
@@ -87,111 +96,112 @@ const IncomeForm = ({ mode, initialValues, onSubmit, onCancel }: IncomeFormProps
                         onChange={(event) => handleChange("amount", event.target.value)}
                         required
                     />
+                    </div>
                 </div>
+
+                <div className="grid gap-4 md:grid-cols-2">
+                    <div className="space-y-2">
+                        <Label className="text-xs uppercase tracking-[0.2em] text-muted-foreground" htmlFor="category">
+                            Category
+                        </Label>
+                        <Select
+                            id="category"
+                            name="category"
+                            className="h-11 rounded-xl border-border/60 bg-background/70"
+                            value={values.category}
+                            onChange={(event) => handleChange("category", event.target.value)}
+                        >
+                            {categoryOptions.map((option) => (
+                                <option key={option} value={option}>
+                                    {option}
+                                </option>
+                            ))}
+                        </Select>
+                    </div>
+                    <div className="space-y-2">
+                        <Label className="text-xs uppercase tracking-[0.2em] text-muted-foreground" htmlFor="recurrence">
+                            Recurrence
+                        </Label>
+                        <Select
+                            id="recurrence"
+                            name="recurrence"
+                            className="h-11 rounded-xl border-border/60 bg-background/70"
+                            value={values.recurrence}
+                            onChange={(event) => handleChange("recurrence", event.target.value)}
+                        >
+                            {recurrenceOptions.map((option) => (
+                                <option key={option} value={option}>
+                                    {option}
+                                </option>
+                            ))}
+                        </Select>
+                    </div>
+                </div>
+
+                <div className="grid gap-4 md:grid-cols-2">
+                    <div className="space-y-2">
+                        <Label className="text-xs uppercase tracking-[0.2em] text-muted-foreground" htmlFor="cadence">
+                            Cadence
+                        </Label>
+                        <Input
+                            id="cadence"
+                            name="cadence"
+                            className="h-11 rounded-xl border-border/60 bg-background/70"
+                            placeholder="e.g., Monthly · 28th"
+                            value={values.cadence}
+                            onChange={(event) => handleChange("cadence", event.target.value)}
+                            required
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label className="text-xs uppercase tracking-[0.2em] text-muted-foreground" htmlFor="nextPayout">
+                            Next payout
+                        </Label>
+                        <Input
+                            id="nextPayout"
+                            name="nextPayout"
+                            type="date"
+                            className="h-11 rounded-xl border-border/60 bg-background/70"
+                            value={values.nextPayout}
+                            onChange={(event) => handleChange("nextPayout", event.target.value)}
+                            required
+                        />
+                    </div>
+                </div>
+
+                <div className="grid gap-4 md:grid-cols-2">
+                    <div className="space-y-2">
+                        <Label className="text-xs uppercase tracking-[0.2em] text-muted-foreground" htmlFor="account">
+                            Deposit account
+                        </Label>
+                        <Input
+                            id="account"
+                            name="account"
+                            className="h-11 rounded-xl border-border/60 bg-background/70"
+                            placeholder="e.g., Checking • 2841"
+                            value={values.account}
+                            onChange={(event) => handleChange("account", event.target.value)}
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label className="text-xs uppercase tracking-[0.2em] text-muted-foreground" htmlFor="note">
+                            Notes
+                        </Label>
+                        <Input
+                            id="note"
+                            name="note"
+                            className="h-11 rounded-xl border-border/60 bg-background/70"
+                            placeholder="Optional context or reminders"
+                            value={values.note}
+                            onChange={(event) => handleChange("note", event.target.value)}
+                        />
+                    </div>
+                </div>
+
+                {error ? <p className="text-sm font-medium text-destructive">{error}</p> : null}
             </div>
 
-            <div className="grid gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                    <Label className="text-xs uppercase tracking-[0.2em] text-muted-foreground" htmlFor="category">
-                        Category
-                    </Label>
-                    <Select
-                        id="category"
-                        name="category"
-                        className="h-11 rounded-xl border-border/60 bg-background/70"
-                        value={values.category}
-                        onChange={(event) => handleChange("category", event.target.value)}
-                    >
-                        {categoryOptions.map((option) => (
-                            <option key={option} value={option}>
-                                {option}
-                            </option>
-                        ))}
-                    </Select>
-                </div>
-                <div className="space-y-2">
-                    <Label className="text-xs uppercase tracking-[0.2em] text-muted-foreground" htmlFor="recurrence">
-                        Recurrence
-                    </Label>
-                    <Select
-                        id="recurrence"
-                        name="recurrence"
-                        className="h-11 rounded-xl border-border/60 bg-background/70"
-                        value={values.recurrence}
-                        onChange={(event) => handleChange("recurrence", event.target.value)}
-                    >
-                        {recurrenceOptions.map((option) => (
-                            <option key={option} value={option}>
-                                {option}
-                            </option>
-                        ))}
-                    </Select>
-                </div>
-            </div>
-
-            <div className="grid gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                    <Label className="text-xs uppercase tracking-[0.2em] text-muted-foreground" htmlFor="cadence">
-                        Cadence
-                    </Label>
-                    <Input
-                        id="cadence"
-                        name="cadence"
-                        className="h-11 rounded-xl border-border/60 bg-background/70"
-                        placeholder="e.g., Monthly · 28th"
-                        value={values.cadence}
-                        onChange={(event) => handleChange("cadence", event.target.value)}
-                        required
-                    />
-                </div>
-                <div className="space-y-2">
-                    <Label className="text-xs uppercase tracking-[0.2em] text-muted-foreground" htmlFor="nextPayout">
-                        Next payout
-                    </Label>
-                    <Input
-                        id="nextPayout"
-                        name="nextPayout"
-                        type="date"
-                        className="h-11 rounded-xl border-border/60 bg-background/70"
-                        value={values.nextPayout}
-                        onChange={(event) => handleChange("nextPayout", event.target.value)}
-                        required
-                    />
-                </div>
-            </div>
-
-            <div className="grid gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                    <Label className="text-xs uppercase tracking-[0.2em] text-muted-foreground" htmlFor="account">
-                        Deposit account
-                    </Label>
-                    <Input
-                        id="account"
-                        name="account"
-                        className="h-11 rounded-xl border-border/60 bg-background/70"
-                        placeholder="e.g., Checking • 2841"
-                        value={values.account}
-                        onChange={(event) => handleChange("account", event.target.value)}
-                    />
-                </div>
-                <div className="space-y-2">
-                    <Label className="text-xs uppercase tracking-[0.2em] text-muted-foreground" htmlFor="note">
-                        Notes
-                    </Label>
-                    <Input
-                        id="note"
-                        name="note"
-                        className="h-11 rounded-xl border-border/60 bg-background/70"
-                        placeholder="Optional context or reminders"
-                        value={values.note}
-                        onChange={(event) => handleChange("note", event.target.value)}
-                    />
-                </div>
-            </div>
-
-            {error ? <p className="text-sm font-medium text-destructive">{error}</p> : null}
-
-            <div className="flex flex-wrap items-center gap-3 pt-2">
+            <div className="mt-4 flex flex-wrap items-center gap-3 border-t border-border/60 bg-card/90 px-1 py-4">
                 <Button type="submit" className="min-w-[140px]">
                     {isCreate ? "Add income" : "Save changes"}
                 </Button>
