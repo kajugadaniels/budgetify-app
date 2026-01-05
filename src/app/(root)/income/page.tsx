@@ -1,6 +1,6 @@
 import React from 'react'
 
-const IncomePageClient = () => {
+const IncomePage = () => {
     return (
         <div>
             Income Page
@@ -8,4 +8,4 @@ const IncomePageClient = () => {
     )
 }
 
-export default IncomePageClient
+export default IncomePage
