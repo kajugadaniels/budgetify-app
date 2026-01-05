@@ -334,7 +334,7 @@ export default function BudgetPageClient() {
                     if (!open && !deleteLoading) setDeleteTarget(null);
                 }}
             >
-                <DialogContent>
+                <DialogContent className="top-0 right-0 left-auto h-full max-w-md translate-x-0 translate-y-0 rounded-none border-l bg-card sm:rounded-l-lg">
                     <DialogHeader>
                         <DialogTitle>Delete budget?</DialogTitle>
                         <DialogDescription>
