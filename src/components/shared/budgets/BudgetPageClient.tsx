@@ -15,6 +15,7 @@ import BudgetFiltersPanel from "./BudgetFilters";
 import BudgetTable from "./BudgetTable";
 import BudgetDetailsSheet from "./BudgetDetailsSheet";
 import BudgetFormSheet from "./BudgetFormSheet";
+import BudgetTransactionSheet from "./BudgetTransactionSheet";
 import {
     Dialog,
     DialogContent,
@@ -72,6 +73,8 @@ export default function BudgetPageClient() {
     const [loading, setLoading] = useState(true);
     const [deleteTarget, setDeleteTarget] = useState<BudgetRecord | null>(null);
     const [deleteLoading, setDeleteLoading] = useState(false);
+    const [transactionBudget, setTransactionBudget] = useState<BudgetRecord | null>(null);
+    const [transactionSheetOpen, setTransactionSheetOpen] = useState(false);
 
     const filteredBudgets = useMemo(() => {
         return budgets.filter((budget) => {
@@ -137,6 +140,11 @@ export default function BudgetPageClient() {
         setEditableBudget(budget);
         setSelectedBudget(budget);
         setFormOpen(true);
+    };
+
+    const handleAddTransaction = (budget: BudgetRecord) => {
+        setTransactionBudget(budget);
+        setTransactionSheetOpen(true);
     };
 
     const handleDelete = (budget: BudgetRecord) => {
@@ -302,7 +310,13 @@ export default function BudgetPageClient() {
                 </div>
             </div>
 
-            <BudgetTable data={filteredBudgets} onView={setSelectedBudget} onEdit={handleEdit} onDelete={handleDelete} />
+            <BudgetTable
+                data={filteredBudgets}
+                onView={setSelectedBudget}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+                onAddTransaction={handleAddTransaction}
+            />
 
             <BudgetDetailsSheet budget={selectedBudget} onClose={() => setSelectedBudget(null)} />
             <BudgetFormSheet
@@ -326,6 +340,21 @@ export default function BudgetPageClient() {
                     setEditableBudget(null);
                 }}
                 onSubmit={handleSubmit}
+            />
+
+            <BudgetTransactionSheet
+                open={transactionSheetOpen}
+                budget={transactionBudget}
+                onClose={() => {
+                    setTransactionSheetOpen(false);
+                    setTransactionBudget(null);
+                }}
+                onCreated={({ budget, transaction }) => {
+                    setBudgets((prev) =>
+                        prev.map((item) => (item.id === budget.id ? { ...budget } : item))
+                    );
+                    setSelectedBudget((prev) => (prev?.id === budget.id ? budget : prev));
+                }}
             />
 
             <Dialog
