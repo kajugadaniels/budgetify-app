@@ -1,14 +1,28 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { LightbulbIcon, Plus, Target, Wallet, Wallet2 } from "lucide-react";
+import { LightbulbIcon, Loader2, Plus, Target, Wallet, Wallet2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { BudgetFilters, BudgetFormValues, BudgetRecord, formatCurrency } from "./types";
+import {
+    BudgetFilters,
+    BudgetFormValues,
+    BudgetRecord,
+    formatCurrency,
+    monthLabels,
+} from "./types";
 import BudgetFiltersPanel from "./BudgetFilters";
 import BudgetTable from "./BudgetTable";
 import BudgetDetailsSheet from "./BudgetDetailsSheet";
 import BudgetFormSheet from "./BudgetFormSheet";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
 
 const seedBudgets: BudgetRecord[] = [
     {
@@ -56,6 +70,8 @@ export default function BudgetPageClient() {
     const [formMode, setFormMode] = useState<"create" | "edit">("create");
     const [editableBudget, setEditableBudget] = useState<BudgetRecord | null>(null);
     const [loading, setLoading] = useState(true);
+    const [deleteTarget, setDeleteTarget] = useState<BudgetRecord | null>(null);
+    const [deleteLoading, setDeleteLoading] = useState(false);
 
     const filteredBudgets = useMemo(() => {
         return budgets.filter((budget) => {
@@ -123,31 +139,28 @@ export default function BudgetPageClient() {
         setFormOpen(true);
     };
 
-    const handleDelete = async (id: string) => {
-        const confirmed = window.confirm(
-            "This action cannot be reversed. Do you want to permanently delete this budget?"
-        );
-        if (!confirmed) return;
+    const handleDelete = (budget: BudgetRecord) => {
+        setDeleteTarget(budget);
+    };
 
-        const promise = (async () => {
-            const response = await fetch(`/api/budgets/${id}`, { method: "DELETE" });
+    const confirmDelete = async () => {
+        if (!deleteTarget) return;
+        setDeleteLoading(true);
+        try {
+            const response = await fetch(`/api/budgets/${deleteTarget.id}`, { method: "DELETE" });
             const body = await response.json().catch(() => null);
             if (!response.ok) throw new Error(body?.error ?? "Failed to delete budget.");
-            return id;
-        })();
 
-        toast.promise(promise, {
-            loading: "Removing budget...",
-            success: "Budget removed",
-            error: (error) => error.message ?? "Unable to remove budget",
-        });
-
-        try {
-            await promise;
-            setBudgets((prev) => prev.filter((item) => item.id !== id));
-            if (selectedBudget?.id === id) setSelectedBudget(null);
-        } catch {
-            // toast covers errors
+            setBudgets((prev) => prev.filter((item) => item.id !== deleteTarget.id));
+            if (selectedBudget?.id === deleteTarget.id) setSelectedBudget(null);
+            toast.success("Budget removed");
+        } catch (error) {
+            toast.error(
+                error instanceof Error ? error.message : "Unable to remove budget right now."
+            );
+        } finally {
+            setDeleteLoading(false);
+            setDeleteTarget(null);
         }
     };
 
@@ -314,6 +327,59 @@ export default function BudgetPageClient() {
                 }}
                 onSubmit={handleSubmit}
             />
+
+            <Dialog
+                open={Boolean(deleteTarget)}
+                onOpenChange={(open) => {
+                    if (!open && !deleteLoading) setDeleteTarget(null);
+                }}
+            >
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Delete budget?</DialogTitle>
+                        <DialogDescription>
+                            This action cannot be reversed. The budget and its history will be removed.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="rounded-xl border border-border/60 bg-muted/30 px-4 py-3 text-sm">
+                        <p className="font-semibold text-foreground">{deleteTarget?.name}</p>
+                        <p className="text-muted-foreground">
+                            {deleteTarget
+                                ? `${monthLabels[(deleteTarget.month || 1) - 1]} ${deleteTarget.year}`
+                                : null}
+                        </p>
+                        <p className="mt-1 text-muted-foreground">
+                            Planned {formatCurrency(deleteTarget?.amount ?? 0)} — Spent{" "}
+                            {formatCurrency(deleteTarget?.spent ?? 0)}
+                        </p>
+                    </div>
+                    <DialogFooter>
+                        <Button
+                            type="button"
+                            variant="outline"
+                            disabled={deleteLoading}
+                            onClick={() => setDeleteTarget(null)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            type="button"
+                            variant="destructive"
+                            disabled={deleteLoading}
+                            onClick={confirmDelete}
+                        >
+                            {deleteLoading ? (
+                                <span className="inline-flex items-center gap-2">
+                                    <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+                                    Deleting...
+                                </span>
+                            ) : (
+                                "Delete budget"
+                            )}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }
