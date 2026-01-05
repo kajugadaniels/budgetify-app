@@ -60,7 +60,7 @@ export default function BudgetFormSheet({
 
     const handleSubmit = async (event: FormEvent) => {
         event.preventDefault();
-        if (!isValid) return;
+        if (!isValid || isSubmitting) return;
         setIsSubmitting(true);
         try {
             const trimmedNote = values.note?.trim() ?? "";
@@ -277,7 +277,13 @@ export default function BudgetFormSheet({
                             Cancel
                         </Button>
                         <Button type="submit" size="sm" disabled={isSubmitting || !isValid}>
-                            {isCreate ? "Add budget" : "Save changes"}
+                            {isSubmitting
+                                ? isCreate
+                                    ? "Adding..."
+                                    : "Saving..."
+                                : isCreate
+                                  ? "Add budget"
+                                  : "Save changes"}
                         </Button>
                     </div>
                 </form>
