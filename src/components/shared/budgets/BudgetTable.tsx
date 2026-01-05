@@ -8,7 +8,7 @@ type Props = {
     data: BudgetRecord[];
     onView: (budget: BudgetRecord) => void;
     onEdit: (budget: BudgetRecord) => void;
-    onDelete: (id: string) => void;
+    onDelete: (budget: BudgetRecord) => void;
 };
 
 export default function BudgetTable({ data, onView, onEdit, onDelete }: Props) {
@@ -92,7 +92,7 @@ export default function BudgetTable({ data, onView, onEdit, onDelete }: Props) {
                             <BudgetActions
                                 onView={() => onView(budget)}
                                 onEdit={() => onEdit(budget)}
-                                onDelete={() => onDelete(budget.id)}
+                                onDelete={() => onDelete(budget)}
                             />
                         </div>
                     </div>
