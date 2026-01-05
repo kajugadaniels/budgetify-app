@@ -24,6 +24,7 @@ const incomeSeed: IncomeRecord[] = [
         category: "Salary",
         recurrence: "Recurring",
         cadence: "Monthly · 28th",
+        paidOn: "2025-01-01",
         nextPayout: "2025-01-28",
         amount: 8200,
         note: "Base compensation with wellness stipend.",
@@ -35,6 +36,7 @@ const incomeSeed: IncomeRecord[] = [
         category: "Consulting",
         recurrence: "Recurring",
         cadence: "Bi-weekly · Fridays",
+        paidOn: "2025-01-03",
         nextPayout: "2025-01-17",
         amount: 2400,
         note: "Retainer for GTM advisory.",
@@ -46,6 +48,7 @@ const incomeSeed: IncomeRecord[] = [
         category: "Investments",
         recurrence: "Recurring",
         cadence: "Monthly · 15th",
+        paidOn: "2025-01-15",
         nextPayout: "2025-02-15",
         amount: 650,
         note: "High-dividend ETFs allocation.",
@@ -57,7 +60,8 @@ const incomeSeed: IncomeRecord[] = [
         category: "Bonus",
         recurrence: "One-time",
         cadence: "Single disbursement",
-        nextPayout: "2025-02-10",
+        paidOn: "2025-02-10",
+        nextPayout: null,
         amount: 3200,
         note: "Q1 launch performance bonus.",
         account: "Checking • 2841",
@@ -68,6 +72,7 @@ const incomeSeed: IncomeRecord[] = [
         category: "Other",
         recurrence: "Recurring",
         cadence: "Monthly · 1st",
+        paidOn: "2025-02-01",
         nextPayout: "2025-03-01",
         amount: 1150,
         note: "Long-term rental agreement.",
@@ -88,7 +93,7 @@ const IncomePage = () => {
     const filteredEntries = useMemo(
         () =>
             entries.filter((income) => {
-                const matchesTimeframe = isWithinTimeframe(income.nextPayout, timeframe);
+                const matchesTimeframe = isWithinTimeframe(income.paidOn, timeframe);
                 const matchesRecurrence =
                     recurrence === "all" ||
                     (recurrence === "recurring" && income.recurrence === "Recurring") ||
@@ -104,8 +109,8 @@ const IncomePage = () => {
             .filter((income) => income.recurrence === "Recurring")
             .reduce((sum, income) => sum + income.amount, 0);
         const nextDate = filteredEntries
-            .map((income) => new Date(income.nextPayout))
-            .filter((date) => !Number.isNaN(date.getTime()))
+            .map((income) => (income.nextPayout ? new Date(income.nextPayout) : null))
+            .filter((date): date is Date => Boolean(date) && !Number.isNaN(date.getTime()))
             .sort((a, b) => a.getTime() - b.getTime())[0];
 
         return {
@@ -175,7 +180,11 @@ const IncomePage = () => {
     };
 
     const handleSubmitIncome = async (values: IncomeFormValues) => {
-        const payload = { ...values, amount: Number(values.amount) };
+        const payload = {
+            ...values,
+            amount: Number(values.amount),
+            nextPayout: values.recurrence === "Recurring" ? values.nextPayout : "",
+        };
         const isEdit = formMode === "edit" && editableIncome;
         const endpoint = isEdit ? `/api/incomes/${editableIncome?.id}` : "/api/incomes";
         const method = isEdit ? "PATCH" : "POST";
