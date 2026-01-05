@@ -38,7 +38,8 @@ export const defaultIncomeFormValues = (): IncomeFormValues => ({
 
 const currencyFormatter = new Intl.NumberFormat("en-US", {
     style: "currency",
-    currency: "USD",
+    currency: "RWF",
+    currencyDisplay: "code",
     maximumFractionDigits: 0,
 });
 
