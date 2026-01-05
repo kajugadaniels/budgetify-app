@@ -1,88 +1,104 @@
 "use client";
 
+import React from "react";
+import { CalendarClock, CreditCard, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import type { IncomeRecord } from "./IncomePageClient";
+import { IncomeRecord, formatCurrency, formatDate } from "./types";
 
-type Props = {
-    open: boolean;
-    onClose: () => void;
+type IncomeDetailsSheetProps = {
     income: IncomeRecord | null;
-    months: string[];
+    onClose: () => void;
 };
 
-export default function IncomeDetailsSheet({
-    open,
-    onClose,
-    income,
-    months,
-}: Props) {
+const metadata: { label: string; key: keyof IncomeRecord; icon?: React.ElementType }[] = [
+    { label: "Source", key: "source", icon: Wallet },
+    { label: "Cadence", key: "cadence", icon: CreditCard },
+    { label: "Next payout", key: "nextPayout", icon: CalendarClock },
+    { label: "Category", key: "category" },
+    { label: "Recurrence", key: "recurrence" },
+    { label: "Account", key: "account" },
+];
+
+const IncomeDetailsSheet = ({ income, onClose }: IncomeDetailsSheetProps) => {
+    if (!income) return null;
+
     return (
-        <>
-            {open && (
-                <div
-                    className="fixed inset-0 z-40 bg-black/30"
-                    onClick={onClose}
-                    aria-hidden
-                />
-            )}
-            <aside
-                className={`fixed inset-y-0 right-0 z-50 w-full max-w-lg transform border-l border-border/60 bg-card/95 shadow-xl backdrop-blur transition-transform duration-300 ${
-                    open ? "translate-x-0" : "translate-x-full"
-                }`}
-                aria-hidden={!open}
+        <div
+            className="fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-sm"
+            onClick={onClose}
+        >
+            <div
+                className="h-full w-full max-w-md border-l border-border/60 bg-card/95 px-6 py-6 shadow-2xl shadow-black/25 transition-transform duration-200 ease-out"
+                onClick={(event) => event.stopPropagation()}
             >
-                <div className="flex items-center justify-between border-b border-border/60 px-6 py-4">
+                <div className="flex items-start justify-between gap-3">
                     <div>
-                        <p className="text-sm font-semibold text-foreground">Income</p>
-                        <p className="text-xs text-muted-foreground">
-                            Details and audit trail.
+                        <p className="text-xs uppercase tracking-[0.28em] text-muted-foreground">
+                            Income Details
+                        </p>
+                        <h3 className="mt-1 text-2xl font-semibold text-foreground">
+                            {income.source}
+                        </h3>
+                        <p className="text-sm text-muted-foreground">
+                            {income.note ?? "No description provided."}
                         </p>
                     </div>
-                    <Button variant="ghost" size="sm" onClick={onClose}>
-                        Close
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="text-muted-foreground"
+                        onClick={onClose}
+                        aria-label="Close"
+                    >
+                        ✕
                     </Button>
                 </div>
-                {income ? (
-                    <div className="space-y-4 px-6 py-6">
-                        <div className="flex items-center justify-between">
-                            <span className="text-sm text-muted-foreground">Amount</span>
-                            <span className="text-lg font-semibold text-foreground">
-                                ${income.amount.toFixed(2)}
-                            </span>
-                        </div>
-                        <div className="flex items-center justify-between">
-                            <span className="text-sm text-muted-foreground">Period</span>
-                            <span className="text-sm font-medium text-foreground">
-                                {months[(income.month || 1) - 1]} {income.year}
-                            </span>
-                        </div>
-                        <div className="space-y-1">
-                            <span className="text-sm text-muted-foreground">Note</span>
-                            <p className="rounded-lg border border-border/60 bg-background px-3 py-2 text-sm text-foreground">
-                                {income.note?.trim() || "No notes"}
-                            </p>
-                        </div>
-                        <div className="grid grid-cols-2 gap-3 text-xs text-muted-foreground">
-                            <div>
-                                <p className="uppercase tracking-[0.15em]">Created</p>
-                                <p className="mt-1 text-foreground">
-                                    {new Date(income.createdAt).toLocaleString()}
+
+                <div className="mt-6 rounded-2xl border border-border/60 bg-background/80 px-5 py-4">
+                    <p className="text-xs uppercase tracking-[0.22em] text-muted-foreground">
+                        Committed inflow
+                    </p>
+                    <p className="mt-2 text-3xl font-semibold text-foreground">
+                        {formatCurrency(income.amount)}
+                    </p>
+                    <p className="text-sm text-muted-foreground">per payout</p>
+                </div>
+
+                <dl className="mt-6 space-y-3">
+                    {metadata.map((item) => {
+                        const value = income[item.key];
+                        if (!value) return null;
+
+                        const Icon = item.icon;
+                        const displayValue =
+                            item.key === "nextPayout"
+                                ? formatDate(String(value))
+                                : typeof value === "string"
+                                    ? value
+                                    : String(value);
+
+                        return (
+                            <div
+                                key={item.key}
+                                className="flex items-start justify-between gap-4 rounded-xl border border-border/60 px-4 py-3"
+                            >
+                                <div className="flex items-center gap-2 text-muted-foreground">
+                                    {Icon ? <Icon className="h-4 w-4" aria-hidden /> : null}
+                                    <span className="text-xs uppercase tracking-[0.22em]">
+                                        {item.label}
+                                    </span>
+                                </div>
+                                <p className="max-w-[60%] text-sm font-medium text-foreground text-right">
+                                    {displayValue}
                                 </p>
                             </div>
-                            <div>
-                                <p className="uppercase tracking-[0.15em]">Updated</p>
-                                <p className="mt-1 text-foreground">
-                                    {new Date(income.updatedAt).toLocaleString()}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                ) : (
-                    <div className="px-6 py-10 text-sm text-muted-foreground">
-                        No income selected.
-                    </div>
-                )}
-            </aside>
-        </>
+                        );
+                    })}
+                </dl>
+            </div>
+        </div>
     );
-}
+};
+
+export default IncomeDetailsSheet;
