@@ -12,7 +12,7 @@ type Props = {
     onAddTransaction: (budget: BudgetRecord) => void;
 };
 
-export default function BudgetTable({ data, onView, onEdit, onDelete }: Props) {
+export default function BudgetTable({ data, onView, onEdit, onDelete, onAddTransaction }: Props) {
     if (!data.length) {
         return (
             <div className="rounded-2xl border border-dashed border-border/60 bg-card/70 p-8 text-center">
