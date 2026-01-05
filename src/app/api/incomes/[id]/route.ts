@@ -9,10 +9,11 @@ import {
     unauthorizedResponse,
 } from "../helpers";
 
-type Params = { id: string };
+type Params = { id?: string } | Promise<{ id?: string }>;
 
 export async function GET(_: Request, props: { params: Params }) {
-    const { id } = props.params;
+    const { id } = await Promise.resolve(props.params);
+    if (!id) return badRequestResponse("Income id is required");
     const dbUser = await resolveAuthenticatedUser();
     if (!dbUser) return unauthorizedResponse();
 
@@ -25,7 +26,8 @@ export async function GET(_: Request, props: { params: Params }) {
 }
 
 export async function PATCH(request: Request, props: { params: Params }) {
-    const { id } = props.params;
+    const { id } = await Promise.resolve(props.params);
+    if (!id) return badRequestResponse("Income id is required");
     const dbUser = await resolveAuthenticatedUser();
     if (!dbUser) return unauthorizedResponse();
 
@@ -50,7 +52,8 @@ export async function PATCH(request: Request, props: { params: Params }) {
 }
 
 export async function DELETE(_: Request, props: { params: Params }) {
-    const { id } = props.params;
+    const { id } = await Promise.resolve(props.params);
+    if (!id) return badRequestResponse("Income id is required");
     const dbUser = await resolveAuthenticatedUser();
     if (!dbUser) return unauthorizedResponse();
 
