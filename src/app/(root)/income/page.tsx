@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Clock3, LightbulbIcon, PiggyBank, Plus, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -78,11 +78,12 @@ const incomeSeed: IncomeRecord[] = [
 const IncomePage = () => {
     const [timeframe, setTimeframe] = useState<TimeframeFilter>("this-month");
     const [recurrence, setRecurrence] = useState<RecurrenceFilter>("all");
-    const [entries, setEntries] = useState<IncomeRecord[]>(incomeSeed);
+    const [entries, setEntries] = useState<IncomeRecord[]>([]);
     const [selectedIncome, setSelectedIncome] = useState<IncomeRecord | null>(null);
     const [formOpen, setFormOpen] = useState(false);
     const [formMode, setFormMode] = useState<"create" | "edit">("create");
     const [editableIncome, setEditableIncome] = useState<IncomeRecord | null>(null);
+    const [loading, setLoading] = useState(true);
 
     const filteredEntries = useMemo(
         () =>
@@ -114,6 +115,28 @@ const IncomePage = () => {
         };
     }, [filteredEntries]);
 
+    const fetchIncomes = useCallback(async () => {
+        setLoading(true);
+        try {
+            const response = await fetch("/api/incomes", { cache: "no-store" });
+            const body = await response.json().catch(() => null);
+            if (!response.ok) throw new Error(body?.error ?? "Unable to load incomes.");
+            setEntries(Array.isArray(body?.data) ? body.data : []);
+        } catch (error) {
+            console.error(error);
+            setEntries(incomeSeed);
+            toast.error("Could not load incomes", {
+                description: error instanceof Error ? error.message : "Please try again.",
+            });
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        fetchIncomes();
+    }, [fetchIncomes]);
+
     const handleAddIncome = () => {
         setFormMode("create");
         setEditableIncome(null);
@@ -128,47 +151,65 @@ const IncomePage = () => {
         setFormOpen(true);
     };
 
-    const handleDeleteIncome = (id: string) => {
-        setEntries((prev) => prev.filter((entry) => entry.id !== id));
-        if (selectedIncome?.id === id) setSelectedIncome(null);
-        toast.success("Income removed from view", {
-            description: "Wire this to your API to persist the deletion.",
+    const handleDeleteIncome = async (id: string) => {
+        const deletePromise = (async () => {
+            const response = await fetch(`/api/incomes/${id}`, { method: "DELETE" });
+            const body = await response.json().catch(() => null);
+            if (!response.ok) throw new Error(body?.error ?? "Failed to delete income.");
+            return id;
+        })();
+
+        toast.promise(deletePromise, {
+            loading: "Removing income...",
+            success: "Income removed",
+            error: (error) => error.message ?? "Unable to remove income",
         });
+
+        try {
+            await deletePromise;
+            setEntries((prev) => prev.filter((entry) => entry.id !== id));
+            if (selectedIncome?.id === id) setSelectedIncome(null);
+        } catch {
+            // toast already handles error messaging
+        }
     };
 
-    const handleSubmitIncome = (values: IncomeFormValues) => {
-        const normalizedAmount = Number(values.amount);
-        const safeAmount = Number.isNaN(normalizedAmount) ? 0 : normalizedAmount;
+    const handleSubmitIncome = async (values: IncomeFormValues) => {
+        const payload = { ...values, amount: Number(values.amount) };
+        const isEdit = formMode === "edit" && editableIncome;
+        const endpoint = isEdit ? `/api/incomes/${editableIncome?.id}` : "/api/incomes";
+        const method = isEdit ? "PATCH" : "POST";
 
-        if (formMode === "edit" && editableIncome) {
-            const updated: IncomeRecord = {
-                ...editableIncome,
-                ...values,
-                amount: safeAmount,
-            };
-            setEntries((prev) =>
-                prev.map((income) => (income.id === editableIncome.id ? updated : income))
-            );
-            setSelectedIncome((prev) =>
-                prev && prev.id === editableIncome.id ? updated : prev
-            );
-            toast.success("Income updated", {
-                description: `${updated.source} adjusted.`,
+        const savePromise = (async () => {
+            const response = await fetch(endpoint, {
+                method,
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
             });
-        } else {
-            const newIncome: IncomeRecord = {
-                id: crypto.randomUUID ? crypto.randomUUID() : `inc-${Date.now()}`,
-                ...values,
-                amount: safeAmount,
-            };
-            setEntries((prev) => [newIncome, ...prev]);
-            toast.success("Income added", {
-                description: `${newIncome.source} added to your inflows.`,
-            });
+            const body = await response.json().catch(() => null);
+            if (!response.ok) throw new Error(body?.error ?? "Unable to save income.");
+            return body?.data as IncomeRecord;
+        })();
+
+        toast.promise(savePromise, {
+            loading: isEdit ? "Saving changes..." : "Adding income...",
+            success: isEdit ? "Income updated" : "Income added",
+            error: (error) => error.message ?? "Something went wrong",
+        });
+
+        try {
+            const saved = await savePromise;
+            if (isEdit && editableIncome) {
+                setEntries((prev) => prev.map((item) => (item.id === saved.id ? saved : item)));
+                setSelectedIncome(saved);
+            } else {
+                setEntries((prev) => [saved, ...prev]);
+            }
+            setFormOpen(false);
+            setEditableIncome(null);
+        } catch {
+            // toast covers messaging
         }
-
-        setFormOpen(false);
-        setEditableIncome(null);
     };
 
     return (
@@ -223,6 +264,7 @@ const IncomePage = () => {
                 recurrence={recurrence}
                 onTimeframeChange={setTimeframe}
                 onRecurrenceChange={setRecurrence}
+                onReset={fetchIncomes}
             />
 
             <div className="grid gap-4 md:grid-cols-3">
