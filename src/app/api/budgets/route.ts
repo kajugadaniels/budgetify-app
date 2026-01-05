@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { resolveAuthenticatedUser } from "../incomes/helpers";
 
 const mapBudget = (budget: any) => ({
     id: budget.id,
@@ -17,10 +17,8 @@ const mapBudget = (budget: any) => ({
 });
 
 export async function GET(req: Request) {
-    const { userId } = auth();
-    if (!userId) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const dbUser = await resolveAuthenticatedUser();
+    if (!dbUser) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const { searchParams } = new URL(req.url);
     const search = searchParams.get("search") || undefined;
@@ -30,7 +28,7 @@ export async function GET(req: Request) {
 
     const budgets = await prisma.budget.findMany({
         where: {
-            userId,
+            userId: dbUser.id,
             ...(month ? { month } : {}),
             ...(year ? { year } : {}),
             ...(category ? { category } : {}),
@@ -54,10 +52,8 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-    const { userId } = auth();
-    if (!userId) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const dbUser = await resolveAuthenticatedUser();
+    if (!dbUser) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const body = await req.json().catch(() => null);
     const name = body?.name?.trim();
@@ -78,7 +74,7 @@ export async function POST(req: Request) {
     try {
         const budget = await prisma.budget.create({
             data: {
-                userId,
+                userId: dbUser.id,
                 name,
                 category,
                 amount: new Prisma.Decimal(amount),
