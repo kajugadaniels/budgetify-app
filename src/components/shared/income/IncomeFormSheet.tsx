@@ -51,7 +51,7 @@ const IncomeFormSheet = ({ open, mode, income, onClose, onSubmit }: IncomeFormSh
             onClick={onClose}
         >
             <div
-                className="h-full w-full max-w-xl border-l border-border/60 bg-card/95 px-6 py-6 shadow-2xl shadow-black/25 transition-transform duration-200 ease-out"
+                className="flex h-full w-full max-w-xl flex-col border-l border-border/60 bg-card/95 px-6 py-6 shadow-2xl shadow-black/25 transition-transform duration-200 ease-out"
                 onClick={(event) => event.stopPropagation()}
             >
                 <div className="flex items-start justify-between gap-3">
@@ -113,12 +113,13 @@ const IncomeFormSheet = ({ open, mode, income, onClose, onSubmit }: IncomeFormSh
                     </div>
                 </div>
 
-                <div className="mt-6 rounded-2xl border border-border/60 bg-card/80 p-5 shadow-inner shadow-black/5">
+                <div className="mt-6 flex flex-1 flex-col overflow-hidden rounded-2xl border border-border/60 bg-card/80 p-5 shadow-inner shadow-black/5">
                     <IncomeForm
                         mode={mode}
                         initialValues={initialValues}
                         onSubmit={onSubmit}
                         onCancel={onClose}
+                        className="flex-1"
                     />
                 </div>
             </div>
