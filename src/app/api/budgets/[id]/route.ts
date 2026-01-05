@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { resolveAuthenticatedUser } from "../../incomes/helpers";
 
 const mapBudget = (budget: any) => ({
     id: budget.id,
@@ -21,13 +21,11 @@ type Params = {
 };
 
 export async function GET(_: Request, { params }: Params) {
-    const { userId } = auth();
-    if (!userId) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const dbUser = await resolveAuthenticatedUser();
+    if (!dbUser) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const budget = await prisma.budget.findFirst({
-        where: { id: params.id, userId },
+        where: { id: params.id, userId: dbUser.id },
     });
 
     if (!budget) {
@@ -38,13 +36,11 @@ export async function GET(_: Request, { params }: Params) {
 }
 
 export async function PATCH(req: Request, { params }: Params) {
-    const { userId } = auth();
-    if (!userId) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const dbUser = await resolveAuthenticatedUser();
+    if (!dbUser) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const existing = await prisma.budget.findFirst({
-        where: { id: params.id, userId },
+        where: { id: params.id, userId: dbUser.id },
     });
     if (!existing) {
         return NextResponse.json({ error: "Budget not found." }, { status: 404 });
@@ -91,13 +87,11 @@ export async function PATCH(req: Request, { params }: Params) {
 }
 
 export async function DELETE(_: Request, { params }: Params) {
-    const { userId } = auth();
-    if (!userId) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const dbUser = await resolveAuthenticatedUser();
+    if (!dbUser) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const existing = await prisma.budget.findFirst({
-        where: { id: params.id, userId },
+        where: { id: params.id, userId: dbUser.id },
     });
     if (!existing) {
         return NextResponse.json({ error: "Budget not found." }, { status: 404 });
