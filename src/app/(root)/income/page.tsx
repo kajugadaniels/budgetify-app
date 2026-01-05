@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Clock3, LightbulbIcon, PiggyBank, Plus, ShieldCheck } from "lucide-react";
+import { Clock3, LightbulbIcon, Loader2, PiggyBank, Plus, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import IncomeFilters from "@/components/shared/income/IncomeFilters";
@@ -16,6 +16,14 @@ import {
     formatCurrency,
     formatDate,
 } from "@/components/shared/income/types";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
 
 const incomeSeed: IncomeRecord[] = [
     {
@@ -89,6 +97,8 @@ const IncomePage = () => {
     const [formMode, setFormMode] = useState<"create" | "edit">("create");
     const [editableIncome, setEditableIncome] = useState<IncomeRecord | null>(null);
     const [loading, setLoading] = useState(true);
+    const [deleteTarget, setDeleteTarget] = useState<IncomeRecord | null>(null);
+    const [deleteLoading, setDeleteLoading] = useState(false);
 
     const filteredEntries = useMemo(
         () =>
@@ -156,31 +166,26 @@ const IncomePage = () => {
         setFormOpen(true);
     };
 
-    const handleDeleteIncome = async (id: string) => {
-        const confirmed = window.confirm(
-            "This action cannot be reversed. Do you want to permanently delete this income?"
-        );
-        if (!confirmed) return;
+    const handleDeleteIncome = (income: IncomeRecord) => {
+        setDeleteTarget(income);
+    };
 
-        const deletePromise = (async () => {
-            const response = await fetch(`/api/incomes/${id}`, { method: "DELETE" });
+    const confirmDeleteIncome = async () => {
+        if (!deleteTarget) return;
+        setDeleteLoading(true);
+        try {
+            const response = await fetch(`/api/incomes/${deleteTarget.id}`, { method: "DELETE" });
             const body = await response.json().catch(() => null);
             if (!response.ok) throw new Error(body?.error ?? "Failed to delete income.");
-            return id;
-        })();
 
-        toast.promise(deletePromise, {
-            loading: "Removing income...",
-            success: "Income removed",
-            error: (error) => error.message ?? "Unable to remove income",
-        });
-
-        try {
-            await deletePromise;
-            setEntries((prev) => prev.filter((entry) => entry.id !== id));
-            if (selectedIncome?.id === id) setSelectedIncome(null);
-        } catch {
-            // toast already handles error messaging
+            setEntries((prev) => prev.filter((entry) => entry.id !== deleteTarget.id));
+            if (selectedIncome?.id === deleteTarget.id) setSelectedIncome(null);
+            toast.success("Income removed");
+        } catch (error) {
+            toast.error(error instanceof Error ? error.message : "Unable to remove income");
+        } finally {
+            setDeleteLoading(false);
+            setDeleteTarget(null);
         }
     };
 
@@ -347,6 +352,55 @@ const IncomePage = () => {
                 }}
                 onSubmit={handleSubmitIncome}
             />
+
+            <Dialog
+                open={Boolean(deleteTarget)}
+                onOpenChange={(open) => {
+                    if (!open && !deleteLoading) setDeleteTarget(null);
+                }}
+            >
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Delete income?</DialogTitle>
+                        <DialogDescription>
+                            This action cannot be reversed. The income record will be removed permanently.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="rounded-xl border border-border/60 bg-muted/30 px-4 py-3 text-sm">
+                        <p className="font-semibold text-foreground">{deleteTarget?.source}</p>
+                        <p className="text-muted-foreground">{deleteTarget?.category}</p>
+                        <p className="mt-1 text-muted-foreground">
+                            Amount {formatCurrency(deleteTarget?.amount ?? 0)} — Next payout{" "}
+                            {deleteTarget?.nextPayout ? formatDate(deleteTarget.nextPayout) : "Not scheduled"}
+                        </p>
+                    </div>
+                    <DialogFooter>
+                        <Button
+                            type="button"
+                            variant="outline"
+                            disabled={deleteLoading}
+                            onClick={() => setDeleteTarget(null)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            type="button"
+                            variant="destructive"
+                            disabled={deleteLoading}
+                            onClick={confirmDeleteIncome}
+                        >
+                            {deleteLoading ? (
+                                <span className="inline-flex items-center gap-2">
+                                    <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+                                    Deleting...
+                                </span>
+                            ) : (
+                                "Delete income"
+                            )}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 };
