@@ -14,6 +14,28 @@ export type IncomeRecord = {
     account?: string;
 };
 
+export type IncomeFormValues = {
+    source: string;
+    category: string;
+    recurrence: IncomeRecord["recurrence"];
+    cadence: string;
+    nextPayout: string;
+    amount: number;
+    note: string;
+    account: string;
+};
+
+export const defaultIncomeFormValues = (): IncomeFormValues => ({
+    source: "",
+    category: "Salary",
+    recurrence: "Recurring",
+    cadence: "",
+    nextPayout: new Date().toISOString().slice(0, 10),
+    amount: 0,
+    note: "",
+    account: "",
+});
+
 const currencyFormatter = new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
