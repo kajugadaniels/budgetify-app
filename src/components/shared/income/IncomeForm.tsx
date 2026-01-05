@@ -11,8 +11,9 @@ import { cn } from "@/lib/utils";
 type IncomeFormProps = {
     mode: "create" | "edit";
     initialValues?: IncomeFormValues;
-    onSubmit: (values: IncomeFormValues) => void;
+    onSubmit: (values: IncomeFormValues) => Promise<void>;
     onCancel: () => void;
+    isSubmitting?: boolean;
     className?: string;
 };
 
@@ -24,6 +25,7 @@ const IncomeForm = ({
     initialValues,
     onSubmit,
     onCancel,
+    isSubmitting = false,
     className,
 }: IncomeFormProps) => {
     const [values, setValues] = useState<IncomeFormValues>(
@@ -57,8 +59,9 @@ const IncomeForm = ({
         setValues((prev) => ({ ...prev, [field]: value }));
     };
 
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
+        if (isSubmitting) return;
         if (!values.source.trim() || !values.cadence.trim() || !values.paidOn) {
             setError("Source, cadence, and date received are required.");
             return;
@@ -72,7 +75,7 @@ const IncomeForm = ({
             return;
         }
 
-        onSubmit(values);
+        await onSubmit(values);
     };
 
     return (
@@ -234,8 +237,14 @@ const IncomeForm = ({
             </div>
 
             <div className="mt-4 flex flex-wrap items-center gap-3 border-t border-border/60 bg-card/90 px-1 py-4">
-                <Button type="submit" className="min-w-[140px]">
-                    {isCreate ? "Add income" : "Save changes"}
+                <Button type="submit" className="min-w-[140px]" disabled={isSubmitting}>
+                    {isSubmitting
+                        ? isCreate
+                            ? "Adding..."
+                            : "Saving..."
+                        : isCreate
+                          ? "Add income"
+                          : "Save changes"}
                 </Button>
                 <Button type="button" variant="ghost" onClick={onCancel}>
                     Cancel
