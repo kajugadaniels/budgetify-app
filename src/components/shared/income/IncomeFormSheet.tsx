@@ -24,16 +24,24 @@ const IncomeFormSheet = ({ open, mode, income, onClose, onSubmit }: IncomeFormSh
     const initialValues = useMemo<IncomeFormValues>(() => {
         if (!income) return defaultIncomeFormValues();
 
-        const nextPayoutDate = new Date(income.nextPayout);
-        const normalizedDate = Number.isNaN(nextPayoutDate.getTime())
-            ? income.nextPayout
-            : nextPayoutDate.toISOString().slice(0, 10);
+        const nextPayoutDate = income.nextPayout ? new Date(income.nextPayout) : null;
+        const normalizedDate =
+            nextPayoutDate && !Number.isNaN(nextPayoutDate.getTime())
+                ? nextPayoutDate.toISOString().slice(0, 10)
+                : "";
+
+        const paidOnDate = income.paidOn ? new Date(income.paidOn) : null;
+        const normalizedPaidOn =
+            paidOnDate && !Number.isNaN(paidOnDate.getTime())
+                ? paidOnDate.toISOString().slice(0, 10)
+                : "";
 
         return {
             source: income.source,
             category: income.category,
             recurrence: income.recurrence,
             cadence: income.cadence,
+            paidOn: normalizedPaidOn,
             nextPayout: normalizedDate,
             amount: income.amount,
             note: income.note ?? "",
@@ -95,11 +103,15 @@ const IncomeFormSheet = ({ open, mode, income, onClose, onSubmit }: IncomeFormSh
                             <CalendarDays className="h-4 w-4 text-primary" aria-hidden />
                         </div>
                         <p className="mt-2 text-sm font-semibold text-foreground">
-                            {initialValues.nextPayout
+                            {initialValues.recurrence === "Recurring"
                                 ? formatDate(initialValues.nextPayout)
-                                : "Not set"}
+                                : "Not scheduled"}
                         </p>
-                        <p className="text-xs text-muted-foreground">Stay ahead of cash timing</p>
+                        <p className="text-xs text-muted-foreground">
+                            {initialValues.recurrence === "Recurring"
+                                ? "Stay ahead of cash timing"
+                                : "One-time receipt, no future payout"}
+                        </p>
                     </div>
                     <div className="rounded-2xl border border-border/60 bg-gradient-to-br from-foreground/10 via-card to-background px-4 py-3">
                         <div className="flex items-center justify-between text-xs uppercase tracking-[0.2em] text-muted-foreground">
