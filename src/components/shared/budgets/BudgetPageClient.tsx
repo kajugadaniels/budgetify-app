@@ -124,6 +124,11 @@ export default function BudgetPageClient() {
     };
 
     const handleDelete = async (id: string) => {
+        const confirmed = window.confirm(
+            "This action cannot be reversed. Do you want to permanently delete this budget?"
+        );
+        if (!confirmed) return;
+
         const promise = (async () => {
             const response = await fetch(`/api/budgets/${id}`, { method: "DELETE" });
             const body = await response.json().catch(() => null);
