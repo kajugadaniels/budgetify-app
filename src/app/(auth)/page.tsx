@@ -1,8 +1,13 @@
-"use client";
-
 import { SignIn } from "@clerk/nextjs";
+import { currentUser } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
 
-const SignInPage = () => {
+const SignInPage = async () => {
+    const user = await currentUser();
+    if (user) {
+        redirect("/dashboard");
+    }
+
     return (
         <div className="space-y-6">
             <div className="space-y-3 text-center">
