@@ -13,6 +13,7 @@ type IncomeDetailsSheetProps = {
 const metadata: { label: string; key: keyof IncomeRecord; icon?: React.ElementType }[] = [
     { label: "Source", key: "source", icon: Wallet },
     { label: "Cadence", key: "cadence", icon: CreditCard },
+    { label: "Paid on", key: "paidOn", icon: CalendarClock },
     { label: "Next payout", key: "nextPayout", icon: CalendarClock },
     { label: "Category", key: "category" },
     { label: "Recurrence", key: "recurrence" },
