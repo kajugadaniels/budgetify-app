@@ -54,7 +54,6 @@ export default async function RootLayout({
         <html lang="en">
             <body className={`${dmSans.variable} ${geistMono.variable} antialiased dark`}>
                 <Providers>
-                    <Navbar />
                     {children}
                 </Providers>
             </body>
