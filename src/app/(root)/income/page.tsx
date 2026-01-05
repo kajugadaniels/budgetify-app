@@ -189,7 +189,7 @@ const IncomePage = () => {
         const endpoint = isEdit ? `/api/incomes/${editableIncome?.id}` : "/api/incomes";
         const method = isEdit ? "PATCH" : "POST";
 
-        const savePromise = (async () => {
+        try {
             const response = await fetch(endpoint, {
                 method,
                 headers: { "Content-Type": "application/json" },
@@ -197,17 +197,7 @@ const IncomePage = () => {
             });
             const body = await response.json().catch(() => null);
             if (!response.ok) throw new Error(body?.error ?? "Unable to save income.");
-            return body?.data as IncomeRecord;
-        })();
-
-        toast.promise(savePromise, {
-            loading: isEdit ? "Saving changes..." : "Adding income...",
-            success: isEdit ? "Income updated" : "Income added",
-            error: (error) => error.message ?? "Something went wrong",
-        });
-
-        try {
-            const saved = await savePromise;
+            const saved = body?.data as IncomeRecord;
             if (isEdit && editableIncome) {
                 setEntries((prev) => prev.map((item) => (item.id === saved.id ? saved : item)));
                 setSelectedIncome(saved);
@@ -216,8 +206,9 @@ const IncomePage = () => {
             }
             setFormOpen(false);
             setEditableIncome(null);
+            toast.success(isEdit ? "Income updated" : "Income added");
         } catch {
-            // toast covers messaging
+            toast.error(isEdit ? "Unable to update income" : "Unable to add income");
         }
     };
 
