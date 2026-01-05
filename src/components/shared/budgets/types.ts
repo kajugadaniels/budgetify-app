@@ -28,6 +28,17 @@ export type BudgetFilters = {
     year?: number;
 };
 
+export type BudgetTransaction = {
+    id: string;
+    budgetId: string;
+    name: string;
+    amount: number;
+    date: string;
+    note?: string;
+    createdAt?: string;
+    updatedAt?: string;
+};
+
 const currencyFormatter = new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "RWF",
