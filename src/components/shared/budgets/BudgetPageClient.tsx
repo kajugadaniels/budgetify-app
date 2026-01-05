@@ -151,7 +151,7 @@ export default function BudgetPageClient() {
         const endpoint = isEdit ? `/api/budgets/${editableBudget?.id}` : "/api/budgets";
         const method = isEdit ? "PATCH" : "POST";
 
-        const promise = (async () => {
+        try {
             const response = await fetch(endpoint, {
                 method,
                 headers: { "Content-Type": "application/json" },
@@ -159,17 +159,7 @@ export default function BudgetPageClient() {
             });
             const body = await response.json().catch(() => null);
             if (!response.ok) throw new Error(body?.error ?? "Unable to save budget.");
-            return body?.data as BudgetRecord;
-        })();
-
-        toast.promise(promise, {
-            loading: isEdit ? "Saving changes..." : "Adding budget...",
-            success: isEdit ? "Budget updated" : "Budget added",
-            error: (error) => error.message ?? "Something went wrong",
-        });
-
-        try {
-            const saved = await promise;
+            const saved = body?.data as BudgetRecord;
             if (isEdit && editableBudget) {
                 setBudgets((prev) => prev.map((item) => (item.id === saved.id ? saved : item)));
                 setSelectedBudget(saved);
@@ -178,8 +168,9 @@ export default function BudgetPageClient() {
             }
             setFormOpen(false);
             setEditableBudget(null);
+            toast.success(isEdit ? "Budget updated" : "Budget added");
         } catch {
-            // toast covers errors
+            toast.error(isEdit ? "Unable to update budget" : "Unable to add budget");
         }
     };
 
