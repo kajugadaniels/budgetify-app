@@ -23,19 +23,29 @@ model User {
   @@map("users")
 }
 
+enum IncomeRecurrence {
+  RECURRING
+  ONE_TIME
+}
+
 model Income {
-  id        String   @id @default(cuid())
-  userId    String
-  day       Int
-  month     Int
-  year      Int
-  amount    Decimal  @db.Decimal(18, 2)
-  note      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         String           @id @default(cuid())
+  userId     String
+  source     String
+  category   String
+  recurrence IncomeRecurrence @default(RECURRING)
+  cadence    String
+  nextPayout DateTime
+  amount     Decimal          @db.Decimal(18, 2)
+  note       String?
+  account    String?
+  day        Int?
+  month      Int?
+  year       Int?
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, month, year])
   @@map("incomes")
 }
