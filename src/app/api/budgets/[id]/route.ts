@@ -97,13 +97,10 @@ export async function DELETE(_: Request, { params }: Params) {
         return NextResponse.json({ error: "Budget not found." }, { status: 404 });
     }
 
-    const result = await prisma.budget.deleteMany({
-        where: { id: params.id, userId: dbUser.id },
+    await prisma.$transaction(async (tx) => {
+        await tx.transaction.deleteMany({ where: { budgetId: params.id } });
+        await tx.budget.delete({ where: { id: params.id } });
     });
-
-    if (result.count === 0) {
-        return NextResponse.json({ error: "Budget not found." }, { status: 404 });
-    }
 
     return NextResponse.json({ data: { id: params.id } });
 }
