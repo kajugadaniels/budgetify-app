@@ -4,7 +4,13 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select } from "@/components/ui/select";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import { IncomeFormValues, defaultIncomeFormValues } from "./types";
 import { cn } from "@/lib/utils";
 
@@ -83,94 +89,116 @@ const IncomeForm = ({
             <div className="flex-1 space-y-5 overflow-y-auto pr-1">
                 <div className="grid gap-4 md:grid-cols-2">
                     <div className="space-y-2">
-                        <Label className="text-xs uppercase tracking-[0.2em] text-muted-foreground" htmlFor="source">
+                        <Label
+                            className="text-xs uppercase tracking-[0.2em] text-muted-foreground"
+                            htmlFor="source"
+                        >
                             Source
                         </Label>
                         <Input
-                        id="source"
-                        name="source"
-                        className="h-11 rounded-xl border-border/60 bg-background/70"
-                        placeholder="e.g., Atlas Corp — Base Salary"
-                        value={values.source}
-                        onChange={(event) => handleChange("source", event.target.value)}
-                        required
-                    />
-                </div>
-                <div className="space-y-2">
-                    <Label className="text-xs uppercase tracking-[0.2em] text-muted-foreground" htmlFor="amount">
-                        Amount
-                    </Label>
-                    <Input
-                        id="amount"
-                        name="amount"
-                        type="number"
-                        min="0"
-                        step="50"
-                        className="h-11 rounded-xl border-border/60 bg-background/70"
-                        placeholder="0"
-                        value={values.amount}
-                        onChange={(event) => handleChange("amount", event.target.value)}
-                        required
-                    />
+                            id="source"
+                            name="source"
+                            className="h-11 rounded-xl border-border/60 bg-background/70"
+                            placeholder="e.g., Atlas Corp - Base Salary"
+                            value={values.source}
+                            onChange={(event) => handleChange("source", event.target.value)}
+                            required
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label
+                            className="text-xs uppercase tracking-[0.2em] text-muted-foreground"
+                            htmlFor="amount"
+                        >
+                            Amount
+                        </Label>
+                        <Input
+                            id="amount"
+                            name="amount"
+                            type="number"
+                            min="0"
+                            step="50"
+                            className="h-11 rounded-xl border-border/60 bg-background/70"
+                            placeholder="0"
+                            value={values.amount}
+                            onChange={(event) => handleChange("amount", event.target.value)}
+                            required
+                        />
                     </div>
                 </div>
 
                 <div className="grid gap-4 md:grid-cols-2">
                     <div className="space-y-2">
-                        <Label className="text-xs uppercase tracking-[0.2em] text-muted-foreground" htmlFor="category">
+                        <Label
+                            className="text-xs uppercase tracking-[0.2em] text-muted-foreground"
+                            htmlFor="category"
+                        >
                             Category
                         </Label>
                         <Select
-                            id="category"
-                            name="category"
-                            className="h-11 rounded-xl border-border/60 bg-background/70"
                             value={values.category}
-                            onChange={(event) => handleChange("category", event.target.value)}
+                            onValueChange={(value) => handleChange("category", value)}
                         >
-                            {categoryOptions.map((option) => (
-                                <option key={option} value={option}>
-                                    {option}
-                                </option>
-                            ))}
+                            <SelectTrigger className="h-11 w-full rounded-xl border-border/60 bg-background/70">
+                                <SelectValue placeholder="Select category" />
+                            </SelectTrigger>
+                            <SelectContent align="start">
+                                {categoryOptions.map((option) => (
+                                    <SelectItem key={option} value={option}>
+                                        {option}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
                         </Select>
                     </div>
                     <div className="space-y-2">
-                        <Label className="text-xs uppercase tracking-[0.2em] text-muted-foreground" htmlFor="recurrence">
+                        <Label
+                            className="text-xs uppercase tracking-[0.2em] text-muted-foreground"
+                            htmlFor="recurrence"
+                        >
                             Recurrence
                         </Label>
                         <Select
-                            id="recurrence"
-                            name="recurrence"
-                            className="h-11 rounded-xl border-border/60 bg-background/70"
                             value={values.recurrence}
-                            onChange={(event) => handleChange("recurrence", event.target.value)}
+                            onValueChange={(value) => handleChange("recurrence", value)}
                         >
-                            {recurrenceOptions.map((option) => (
-                                <option key={option} value={option}>
-                                    {option}
-                                </option>
-                            ))}
+                            <SelectTrigger className="h-11 w-full rounded-xl border-border/60 bg-background/70">
+                                <SelectValue placeholder="Select recurrence" />
+                            </SelectTrigger>
+                            <SelectContent align="start">
+                                {recurrenceOptions.map((option) => (
+                                    <SelectItem key={option} value={option}>
+                                        {option}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
                         </Select>
                     </div>
                 </div>
 
                 <div className="grid gap-4 md:grid-cols-2">
                     <div className="space-y-2">
-                        <Label className="text-xs uppercase tracking-[0.2em] text-muted-foreground" htmlFor="cadence">
+                        <Label
+                            className="text-xs uppercase tracking-[0.2em] text-muted-foreground"
+                            htmlFor="cadence"
+                        >
                             Cadence
                         </Label>
                         <Input
                             id="cadence"
                             name="cadence"
                             className="h-11 rounded-xl border-border/60 bg-background/70"
-                            placeholder="e.g., Monthly · 28th"
+                            placeholder="e.g., Monthly - 28th"
                             value={values.cadence}
                             onChange={(event) => handleChange("cadence", event.target.value)}
                             required
                         />
                     </div>
                     <div className="space-y-2">
-                        <Label className="text-xs uppercase tracking-[0.2em] text-muted-foreground" htmlFor="nextPayout">
+                        <Label
+                            className="text-xs uppercase tracking-[0.2em] text-muted-foreground"
+                            htmlFor="nextPayout"
+                        >
                             Next payout
                         </Label>
                         <Input
@@ -191,20 +219,26 @@ const IncomeForm = ({
 
                 <div className="grid gap-4 md:grid-cols-2">
                     <div className="space-y-2">
-                        <Label className="text-xs uppercase tracking-[0.2em] text-muted-foreground" htmlFor="account">
+                        <Label
+                            className="text-xs uppercase tracking-[0.2em] text-muted-foreground"
+                            htmlFor="account"
+                        >
                             Deposit account
                         </Label>
                         <Input
                             id="account"
                             name="account"
                             className="h-11 rounded-xl border-border/60 bg-background/70"
-                            placeholder="e.g., Checking • 2841"
+                            placeholder="e.g., Checking - 2841"
                             value={values.account}
                             onChange={(event) => handleChange("account", event.target.value)}
                         />
                     </div>
                     <div className="space-y-2">
-                        <Label className="text-xs uppercase tracking-[0.2em] text-muted-foreground" htmlFor="paidOn">
+                        <Label
+                            className="text-xs uppercase tracking-[0.2em] text-muted-foreground"
+                            htmlFor="paidOn"
+                        >
                             Date received
                         </Label>
                         <Input
@@ -220,7 +254,10 @@ const IncomeForm = ({
                 </div>
 
                 <div className="space-y-2">
-                    <Label className="text-xs uppercase tracking-[0.2em] text-muted-foreground" htmlFor="note">
+                    <Label
+                        className="text-xs uppercase tracking-[0.2em] text-muted-foreground"
+                        htmlFor="note"
+                    >
                         Notes
                     </Label>
                     <Input
