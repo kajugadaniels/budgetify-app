@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarClock, CreditCard, Wallet } from "lucide-react";
+import { CalendarCheck, CalendarClock, CreditCard, Wallet } from "lucide-react";
 import IncomeActions from "./IncomeActions";
 import { IncomeRecord, formatCurrency, formatDate } from "./types";
 
@@ -35,10 +35,11 @@ const IncomeTable = ({ data, onView, onEdit, onDelete }: IncomeTableProps) => {
 
     return (
         <div className="overflow-hidden rounded-3xl border border-border/70 bg-card/90 shadow-lg shadow-black/5">
-            <div className="hidden bg-muted/60 px-6 py-3 text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground md:grid md:grid-cols-[1.6fr_1fr_1fr_1fr_auto]">
+            <div className="hidden bg-muted/60 px-6 py-3 text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground md:grid md:grid-cols-[1.6fr_1fr_1fr_1fr_1fr_auto]">
                 <span>Source</span>
                 <span className="text-center">Amount</span>
                 <span className="text-center">Cadence</span>
+                <span className="text-center">Paid on</span>
                 <span className="text-center">Next payout</span>
                 <span className="text-right">Actions</span>
             </div>
@@ -55,7 +56,7 @@ const IncomeTable = ({ data, onView, onEdit, onDelete }: IncomeTableProps) => {
                                 onView(income);
                             }
                         }}
-                        className="group grid cursor-pointer gap-3 px-4 py-4 transition-colors hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary md:grid-cols-[1.6fr_1fr_1fr_1fr_auto] md:px-6 md:py-5"
+                        className="group grid cursor-pointer gap-3 px-4 py-4 transition-colors hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary md:grid-cols-[1.6fr_1fr_1fr_1fr_1fr_auto] md:px-6 md:py-5"
                     >
                         <div className="flex items-center gap-3">
                             <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-primary/15 via-primary/10 to-background text-primary shadow-inner shadow-primary/10">
@@ -89,8 +90,15 @@ const IncomeTable = ({ data, onView, onEdit, onDelete }: IncomeTableProps) => {
                         </div>
 
                         <div className="flex items-center gap-2 text-sm text-muted-foreground md:justify-center">
+                            <CalendarCheck className="h-4 w-4 text-primary" aria-hidden />
+                            <div className="text-foreground">{formatDate(income.paidOn)}</div>
+                        </div>
+
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground md:justify-center">
                             <CalendarClock className="h-4 w-4 text-primary" aria-hidden />
-                            <div className="text-foreground">{formatDate(income.nextPayout)}</div>
+                            <div className="text-foreground">
+                                {income.nextPayout ? formatDate(income.nextPayout) : "—"}
+                            </div>
                         </div>
 
                         <div className="flex items-center justify-end">
