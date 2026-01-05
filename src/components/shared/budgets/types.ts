@@ -30,7 +30,7 @@ export type BudgetFilters = {
 
 const currencyFormatter = new Intl.NumberFormat("en-US", {
     style: "currency",
-    currency: "USD",
+    currency: "RWF",
     maximumFractionDigits: 0,
 });
 
