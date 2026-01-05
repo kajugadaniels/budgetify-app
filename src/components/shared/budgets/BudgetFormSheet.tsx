@@ -5,7 +5,13 @@ import { CalendarDays, Sparkles, Wallet2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select } from "@/components/ui/select";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import { BudgetFormValues, formatCurrency, monthLabels } from "./types";
 
 type Props = {
@@ -217,26 +223,30 @@ export default function BudgetFormSheet({
 
                         <div className="grid gap-4 md:grid-cols-2">
                             <div className="space-y-1.5">
-                                <Label className="text-sm font-semibold text-foreground">
-                                    Month (required)
-                                </Label>
-                                <Select
-                                    value={values.month}
-                                    onChange={(e) =>
-                                        setValues((prev) => ({
-                                            ...prev,
-                                            month: Number.parseInt(e.target.value, 10),
-                                        }))
-                                    }
-                                    required
-                                >
-                                    {monthLabels.map((label, idx) => (
-                                        <option key={label} value={idx + 1}>
-                                            {label}
-                                        </option>
-                                    ))}
-                                </Select>
-                            </div>
+                        <Label className="text-sm font-semibold text-foreground">
+                            Month (required)
+                        </Label>
+                        <Select
+                            value={String(values.month)}
+                            onValueChange={(value) =>
+                                setValues((prev) => ({
+                                    ...prev,
+                                    month: Number.parseInt(value, 10),
+                                }))
+                            }
+                        >
+                            <SelectTrigger className="h-11 w-full rounded-xl border-border/60 bg-background/70">
+                                <SelectValue placeholder="Choose month" />
+                            </SelectTrigger>
+                            <SelectContent align="start">
+                                {monthLabels.map((label, idx) => (
+                                    <SelectItem key={label} value={String(idx + 1)}>
+                                        {label}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
                             <div className="space-y-1.5">
                                 <Label className="text-sm font-semibold text-foreground">
                                     Year (required)
