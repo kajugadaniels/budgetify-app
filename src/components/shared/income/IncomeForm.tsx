@@ -2,6 +2,9 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select } from "@/components/ui/select";
 import { IncomeFormValues, defaultIncomeFormValues } from "./types";
 
 type IncomeFormProps = {
@@ -13,11 +16,6 @@ type IncomeFormProps = {
 
 const categoryOptions = ["Salary", "Consulting", "Investments", "Bonus", "Other"];
 const recurrenceOptions: IncomeFormValues["recurrence"][] = ["Recurring", "One-time"];
-
-const inputClass =
-    "w-full rounded-xl border border-border/60 bg-background/70 px-3 py-2.5 text-sm text-foreground shadow-inner shadow-black/5 transition focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20";
-
-const labelClass = "text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground";
 
 const IncomeForm = ({ mode, initialValues, onSubmit, onCancel }: IncomeFormProps) => {
     const [values, setValues] = useState<IncomeFormValues>(
@@ -60,13 +58,13 @@ const IncomeForm = ({ mode, initialValues, onSubmit, onCancel }: IncomeFormProps
         <form onSubmit={handleSubmit} className="space-y-5">
             <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                    <label className={labelClass} htmlFor="source">
+                    <Label className="text-xs uppercase tracking-[0.2em] text-muted-foreground" htmlFor="source">
                         Source
-                    </label>
-                    <input
+                    </Label>
+                    <Input
                         id="source"
                         name="source"
-                        className={inputClass}
+                        className="h-11 rounded-xl border-border/60 bg-background/70"
                         placeholder="e.g., Atlas Corp — Base Salary"
                         value={values.source}
                         onChange={(event) => handleChange("source", event.target.value)}
@@ -74,16 +72,16 @@ const IncomeForm = ({ mode, initialValues, onSubmit, onCancel }: IncomeFormProps
                     />
                 </div>
                 <div className="space-y-2">
-                    <label className={labelClass} htmlFor="amount">
+                    <Label className="text-xs uppercase tracking-[0.2em] text-muted-foreground" htmlFor="amount">
                         Amount
-                    </label>
-                    <input
+                    </Label>
+                    <Input
                         id="amount"
                         name="amount"
                         type="number"
                         min="0"
                         step="50"
-                        className={inputClass}
+                        className="h-11 rounded-xl border-border/60 bg-background/70"
                         placeholder="0"
                         value={values.amount}
                         onChange={(event) => handleChange("amount", event.target.value)}
@@ -94,13 +92,13 @@ const IncomeForm = ({ mode, initialValues, onSubmit, onCancel }: IncomeFormProps
 
             <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                    <label className={labelClass} htmlFor="category">
+                    <Label className="text-xs uppercase tracking-[0.2em] text-muted-foreground" htmlFor="category">
                         Category
-                    </label>
-                    <select
+                    </Label>
+                    <Select
                         id="category"
                         name="category"
-                        className={inputClass}
+                        className="h-11 rounded-xl border-border/60 bg-background/70"
                         value={values.category}
                         onChange={(event) => handleChange("category", event.target.value)}
                     >
@@ -109,16 +107,16 @@ const IncomeForm = ({ mode, initialValues, onSubmit, onCancel }: IncomeFormProps
                                 {option}
                             </option>
                         ))}
-                    </select>
+                    </Select>
                 </div>
                 <div className="space-y-2">
-                    <label className={labelClass} htmlFor="recurrence">
+                    <Label className="text-xs uppercase tracking-[0.2em] text-muted-foreground" htmlFor="recurrence">
                         Recurrence
-                    </label>
-                    <select
+                    </Label>
+                    <Select
                         id="recurrence"
                         name="recurrence"
-                        className={inputClass}
+                        className="h-11 rounded-xl border-border/60 bg-background/70"
                         value={values.recurrence}
                         onChange={(event) => handleChange("recurrence", event.target.value)}
                     >
@@ -127,19 +125,19 @@ const IncomeForm = ({ mode, initialValues, onSubmit, onCancel }: IncomeFormProps
                                 {option}
                             </option>
                         ))}
-                    </select>
+                    </Select>
                 </div>
             </div>
 
             <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                    <label className={labelClass} htmlFor="cadence">
+                    <Label className="text-xs uppercase tracking-[0.2em] text-muted-foreground" htmlFor="cadence">
                         Cadence
-                    </label>
-                    <input
+                    </Label>
+                    <Input
                         id="cadence"
                         name="cadence"
-                        className={inputClass}
+                        className="h-11 rounded-xl border-border/60 bg-background/70"
                         placeholder="e.g., Monthly · 28th"
                         value={values.cadence}
                         onChange={(event) => handleChange("cadence", event.target.value)}
@@ -147,14 +145,14 @@ const IncomeForm = ({ mode, initialValues, onSubmit, onCancel }: IncomeFormProps
                     />
                 </div>
                 <div className="space-y-2">
-                    <label className={labelClass} htmlFor="nextPayout">
+                    <Label className="text-xs uppercase tracking-[0.2em] text-muted-foreground" htmlFor="nextPayout">
                         Next payout
-                    </label>
-                    <input
+                    </Label>
+                    <Input
                         id="nextPayout"
                         name="nextPayout"
                         type="date"
-                        className={inputClass}
+                        className="h-11 rounded-xl border-border/60 bg-background/70"
                         value={values.nextPayout}
                         onChange={(event) => handleChange("nextPayout", event.target.value)}
                         required
@@ -164,26 +162,26 @@ const IncomeForm = ({ mode, initialValues, onSubmit, onCancel }: IncomeFormProps
 
             <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                    <label className={labelClass} htmlFor="account">
+                    <Label className="text-xs uppercase tracking-[0.2em] text-muted-foreground" htmlFor="account">
                         Deposit account
-                    </label>
-                    <input
+                    </Label>
+                    <Input
                         id="account"
                         name="account"
-                        className={inputClass}
+                        className="h-11 rounded-xl border-border/60 bg-background/70"
                         placeholder="e.g., Checking • 2841"
                         value={values.account}
                         onChange={(event) => handleChange("account", event.target.value)}
                     />
                 </div>
                 <div className="space-y-2">
-                    <label className={labelClass} htmlFor="note">
+                    <Label className="text-xs uppercase tracking-[0.2em] text-muted-foreground" htmlFor="note">
                         Notes
-                    </label>
-                    <input
+                    </Label>
+                    <Input
                         id="note"
                         name="note"
-                        className={inputClass}
+                        className="h-11 rounded-xl border-border/60 bg-background/70"
                         placeholder="Optional context or reminders"
                         value={values.note}
                         onChange={(event) => handleChange("note", event.target.value)}
