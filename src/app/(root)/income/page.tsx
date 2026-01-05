@@ -157,6 +157,11 @@ const IncomePage = () => {
     };
 
     const handleDeleteIncome = async (id: string) => {
+        const confirmed = window.confirm(
+            "This action cannot be reversed. Do you want to permanently delete this income?"
+        );
+        if (!confirmed) return;
+
         const deletePromise = (async () => {
             const response = await fetch(`/api/incomes/${id}`, { method: "DELETE" });
             const body = await response.json().catch(() => null);
