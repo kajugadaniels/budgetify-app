@@ -8,7 +8,8 @@ export type IncomeRecord = {
     category: string;
     recurrence: "Recurring" | "One-time";
     cadence: string;
-    nextPayout: string; // ISO date
+    paidOn: string; // ISO date
+    nextPayout?: string | null; // ISO date
     amount: number;
     note?: string;
     account?: string;
@@ -19,6 +20,7 @@ export type IncomeFormValues = {
     category: string;
     recurrence: IncomeRecord["recurrence"];
     cadence: string;
+    paidOn: string;
     nextPayout: string;
     amount: number;
     note: string;
@@ -30,6 +32,7 @@ export const defaultIncomeFormValues = (): IncomeFormValues => ({
     category: "Salary",
     recurrence: "Recurring",
     cadence: "",
+    paidOn: new Date().toISOString().slice(0, 10),
     nextPayout: new Date().toISOString().slice(0, 10),
     amount: 0,
     note: "",
@@ -51,7 +54,8 @@ const dateFormatter = new Intl.DateTimeFormat("en-US", {
 
 export const formatCurrency = (value: number) => currencyFormatter.format(value);
 
-export const formatDate = (isoDate: string) => {
+export const formatDate = (isoDate?: string | null) => {
+    if (!isoDate) return "—";
     const date = new Date(isoDate);
     if (Number.isNaN(date.getTime())) return isoDate;
     return dateFormatter.format(date);
