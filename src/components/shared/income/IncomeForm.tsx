@@ -45,13 +45,26 @@ const IncomeForm = ({
             return;
         }
 
+        if (field === "recurrence") {
+            setValues((prev) => ({
+                ...prev,
+                recurrence: value as IncomeFormValues["recurrence"],
+                nextPayout: value === "Recurring" ? prev.nextPayout : "",
+            }));
+            return;
+        }
+
         setValues((prev) => ({ ...prev, [field]: value }));
     };
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        if (!values.source.trim() || !values.cadence.trim() || !values.nextPayout) {
-            setError("Source, cadence, and payout date are required.");
+        if (!values.source.trim() || !values.cadence.trim() || !values.paidOn) {
+            setError("Source, cadence, and date received are required.");
+            return;
+        }
+        if (values.recurrence === "Recurring" && !values.nextPayout) {
+            setError("Next payout date is required for recurring incomes.");
             return;
         }
         if (!values.amount || Number.isNaN(values.amount) || values.amount <= 0) {
@@ -164,8 +177,12 @@ const IncomeForm = ({
                             className="h-11 rounded-xl border-border/60 bg-background/70"
                             value={values.nextPayout}
                             onChange={(event) => handleChange("nextPayout", event.target.value)}
-                            required
+                            required={values.recurrence === "Recurring"}
+                            disabled={values.recurrence === "One-time"}
                         />
+                        <p className="text-xs text-muted-foreground">
+                            Required for recurring incomes; leave blank for one-time.
+                        </p>
                     </div>
                 </div>
 
@@ -184,18 +201,33 @@ const IncomeForm = ({
                         />
                     </div>
                     <div className="space-y-2">
-                        <Label className="text-xs uppercase tracking-[0.2em] text-muted-foreground" htmlFor="note">
-                            Notes
+                        <Label className="text-xs uppercase tracking-[0.2em] text-muted-foreground" htmlFor="paidOn">
+                            Date received
                         </Label>
                         <Input
-                            id="note"
-                            name="note"
+                            id="paidOn"
+                            name="paidOn"
+                            type="date"
                             className="h-11 rounded-xl border-border/60 bg-background/70"
-                            placeholder="Optional context or reminders"
-                            value={values.note}
-                            onChange={(event) => handleChange("note", event.target.value)}
+                            value={values.paidOn}
+                            onChange={(event) => handleChange("paidOn", event.target.value)}
+                            required
                         />
                     </div>
+                </div>
+
+                <div className="space-y-2">
+                    <Label className="text-xs uppercase tracking-[0.2em] text-muted-foreground" htmlFor="note">
+                        Notes
+                    </Label>
+                    <Input
+                        id="note"
+                        name="note"
+                        className="h-11 rounded-xl border-border/60 bg-background/70"
+                        placeholder="Optional context or reminders"
+                        value={values.note}
+                        onChange={(event) => handleChange("note", event.target.value)}
+                    />
                 </div>
 
                 {error ? <p className="text-sm font-medium text-destructive">{error}</p> : null}
