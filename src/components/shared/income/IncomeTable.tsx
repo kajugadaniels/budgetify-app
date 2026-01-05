@@ -1,106 +1,110 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { IncomeRecord } from "./IncomePageClient";
+import { CalendarClock, CreditCard, Wallet } from "lucide-react";
+import IncomeActions from "./IncomeActions";
+import { IncomeRecord, formatCurrency, formatDate } from "./types";
 
-type Props = {
-    incomes: IncomeRecord[];
-    months: string[];
-    isLoading: boolean;
-    onOpenFilters: () => void;
-    onAdd: () => void;
-    onEdit: (income: IncomeRecord) => void;
+type IncomeTableProps = {
+    data: IncomeRecord[];
     onView: (income: IncomeRecord) => void;
-    onRefresh: () => void;
+    onEdit: (income: IncomeRecord) => void;
+    onDelete: (id: string) => void;
 };
 
-export default function IncomeTable({
-    incomes,
-    months,
-    isLoading,
-    onOpenFilters,
-    onAdd,
-    onEdit,
-    onView,
-    onRefresh,
-}: Props) {
-    return (
-        <div className="rounded-2xl border border-border/60 bg-card/70 shadow-sm backdrop-blur">
-            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/60 px-4 py-3">
-                <div className="flex items-center gap-3">
-                    <Button variant="outline" size="sm" onClick={onOpenFilters}>
-                        Filters
-                    </Button>
-                    <Button variant="outline" size="sm" onClick={onRefresh}>
-                        Refresh
-                    </Button>
+const recurrenceTone: Record<IncomeRecord["recurrence"], string> = {
+    Recurring: "bg-primary/10 text-primary",
+    "One-time": "bg-foreground/10 text-foreground",
+};
+
+const IncomeTable = ({ data, onView, onEdit, onDelete }: IncomeTableProps) => {
+    if (!data.length) {
+        return (
+            <div className="rounded-2xl border border-dashed border-border/60 bg-card/70 p-8 text-center">
+                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                    <Wallet className="h-5 w-5" aria-hidden />
                 </div>
-                <Button size="sm" onClick={onAdd}>
-                    Add income
-                </Button>
+                <p className="mt-3 text-base font-semibold text-foreground">
+                    No incomes to show yet
+                </p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                    Add your first income stream to start tracking inflows and coverage.
+                </p>
             </div>
-            <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-border/60 text-sm">
-                    <thead className="bg-muted/40 text-muted-foreground">
-                        <tr>
-                            <th className="px-4 py-3 text-left font-medium">Period</th>
-                            <th className="px-4 py-3 text-left font-medium">Amount</th>
-                            <th className="px-4 py-3 text-left font-medium">Note</th>
-                            <th className="px-4 py-3 text-left font-medium">Updated</th>
-                            <th className="px-4 py-3 text-right font-medium">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-border/60">
-                        {incomes.length === 0 && (
-                            <tr>
-                                <td
-                                    colSpan={5}
-                                    className="px-4 py-6 text-center text-muted-foreground"
-                                >
-                                    {isLoading ? "Loading…" : "No incomes found."}
-                                </td>
-                            </tr>
-                        )}
-                        {incomes.map((income) => (
-                            <tr
-                                key={income.id}
-                                className="transition-colors hover:bg-muted/30"
+        );
+    }
+
+    return (
+        <div className="overflow-hidden rounded-3xl border border-border/70 bg-card/90 shadow-lg shadow-black/5">
+            <div className="hidden bg-muted/60 px-6 py-3 text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground md:grid md:grid-cols-[1.6fr_1fr_1fr_1fr_auto]">
+                <span>Source</span>
+                <span className="text-center">Amount</span>
+                <span className="text-center">Cadence</span>
+                <span className="text-center">Next payout</span>
+                <span className="text-right">Actions</span>
+            </div>
+            <div className="divide-y divide-border/70">
+                {data.map((income) => (
+                    <div
+                        key={income.id}
+                        role="button"
+                        tabIndex={0}
+                        onClick={() => onView(income)}
+                        onKeyDown={(event) => {
+                            if (event.key === "Enter" || event.key === " ") {
+                                event.preventDefault();
+                                onView(income);
+                            }
+                        }}
+                        className="group grid cursor-pointer gap-3 px-4 py-4 transition-colors hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary md:grid-cols-[1.6fr_1fr_1fr_1fr_auto] md:px-6 md:py-5"
+                    >
+                        <div className="flex items-center gap-3">
+                            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-primary/15 via-primary/10 to-background text-primary shadow-inner shadow-primary/10">
+                                <Wallet className="h-5 w-5" aria-hidden />
+                            </div>
+                            <div className="min-w-0">
+                                <p className="text-sm font-semibold text-foreground">
+                                    {income.source}
+                                </p>
+                                <p className="mt-1 text-xs text-muted-foreground">
+                                    {income.note ?? "No description provided"}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="flex items-center justify-between md:justify-center">
+                            <span className="text-base font-semibold text-foreground">
+                                {formatCurrency(income.amount)}
+                            </span>
+                            <span
+                                className={`ml-2 inline-flex items-center gap-1 rounded-full px-3 py-1 text-[11px] font-medium ${recurrenceTone[income.recurrence]}`}
                             >
-                                <td className="px-4 py-3 font-medium text-foreground">
-                                    {months[(income.month || 1) - 1]} {income.year}
-                                </td>
-                                <td className="px-4 py-3 text-foreground">
-                                    ${income.amount.toFixed(2)}
-                                </td>
-                                <td className="px-4 py-3 text-muted-foreground">
-                                    {income.note?.trim() || "—"}
-                                </td>
-                                <td className="px-4 py-3 text-muted-foreground">
-                                    {new Date(income.updatedAt).toLocaleDateString()}
-                                </td>
-                                <td className="px-4 py-3 text-right text-sm">
-                                    <div className="inline-flex items-center gap-2">
-                                        <Button
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={() => onView(income)}
-                                        >
-                                            View
-                                        </Button>
-                                        <Button
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={() => onEdit(income)}
-                                        >
-                                            Edit
-                                        </Button>
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+                                <span className="h-1.5 w-1.5 rounded-full bg-current" />
+                                {income.recurrence}
+                            </span>
+                        </div>
+
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground md:justify-center">
+                            <CreditCard className="h-4 w-4 text-primary" aria-hidden />
+                            <div className="text-foreground">{income.cadence}</div>
+                        </div>
+
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground md:justify-center">
+                            <CalendarClock className="h-4 w-4 text-primary" aria-hidden />
+                            <div className="text-foreground">{formatDate(income.nextPayout)}</div>
+                        </div>
+
+                        <div className="flex items-center justify-end">
+                            <IncomeActions
+                                onView={() => onView(income)}
+                                onEdit={() => onEdit(income)}
+                                onDelete={() => onDelete(income.id)}
+                            />
+                        </div>
+                    </div>
+                ))}
             </div>
         </div>
     );
-}
+};
+
+export default IncomeTable;
