@@ -8,7 +8,7 @@ type IncomeTableProps = {
     data: IncomeRecord[];
     onView: (income: IncomeRecord) => void;
     onEdit: (income: IncomeRecord) => void;
-    onDelete: (id: string) => void;
+    onDelete: (income: IncomeRecord) => void;
 };
 
 const recurrenceTone: Record<IncomeRecord["recurrence"], string> = {
@@ -105,7 +105,7 @@ const IncomeTable = ({ data, onView, onEdit, onDelete }: IncomeTableProps) => {
                             <IncomeActions
                                 onView={() => onView(income)}
                                 onEdit={() => onEdit(income)}
-                                onDelete={() => onDelete(income.id)}
+                                onDelete={() => onDelete(income)}
                             />
                         </div>
                     </div>
