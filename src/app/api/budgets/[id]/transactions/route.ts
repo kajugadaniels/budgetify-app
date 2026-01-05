@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { resolveAuthenticatedUser } from "../../incomes/helpers";
+import { resolveAuthenticatedUser } from "../../../incomes/helpers";
 
 type Params = { params: { id: string } };
 
