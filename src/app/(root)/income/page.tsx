@@ -1,14 +1,16 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Clock3, PiggyBank, Plus, ShieldCheck, Sparkles } from "lucide-react";
+import { Clock3, LightbulbIcon, PiggyBank, Plus, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import IncomeFilters from "@/components/shared/income/IncomeFilters";
 import IncomeTable from "@/components/shared/income/IncomeTable";
 import IncomeDetailsSheet from "@/components/shared/income/IncomeDetailsSheet";
+import IncomeFormSheet from "@/components/shared/income/IncomeFormSheet";
 import {
     IncomeRecord,
+    IncomeFormValues,
     RecurrenceFilter,
     TimeframeFilter,
     formatCurrency,
@@ -78,6 +80,9 @@ const IncomePage = () => {
     const [recurrence, setRecurrence] = useState<RecurrenceFilter>("all");
     const [entries, setEntries] = useState<IncomeRecord[]>(incomeSeed);
     const [selectedIncome, setSelectedIncome] = useState<IncomeRecord | null>(null);
+    const [formOpen, setFormOpen] = useState(false);
+    const [formMode, setFormMode] = useState<"create" | "edit">("create");
+    const [editableIncome, setEditableIncome] = useState<IncomeRecord | null>(null);
 
     const filteredEntries = useMemo(
         () =>
@@ -110,15 +115,17 @@ const IncomePage = () => {
     }, [filteredEntries]);
 
     const handleAddIncome = () => {
-        toast.message("Add income", {
-            description: "Hook this button to your create-income flow or modal.",
-        });
+        setFormMode("create");
+        setEditableIncome(null);
+        setSelectedIncome(null);
+        setFormOpen(true);
     };
 
     const handleEditIncome = (income: IncomeRecord) => {
-        toast.info(`Edit ${income.source}`, {
-            description: "Connect this action to your edit drawer or form.",
-        });
+        setFormMode("edit");
+        setEditableIncome(income);
+        setSelectedIncome(income);
+        setFormOpen(true);
     };
 
     const handleDeleteIncome = (id: string) => {
@@ -127,6 +134,41 @@ const IncomePage = () => {
         toast.success("Income removed from view", {
             description: "Wire this to your API to persist the deletion.",
         });
+    };
+
+    const handleSubmitIncome = (values: IncomeFormValues) => {
+        const normalizedAmount = Number(values.amount);
+        const safeAmount = Number.isNaN(normalizedAmount) ? 0 : normalizedAmount;
+
+        if (formMode === "edit" && editableIncome) {
+            const updated: IncomeRecord = {
+                ...editableIncome,
+                ...values,
+                amount: safeAmount,
+            };
+            setEntries((prev) =>
+                prev.map((income) => (income.id === editableIncome.id ? updated : income))
+            );
+            setSelectedIncome((prev) =>
+                prev && prev.id === editableIncome.id ? updated : prev
+            );
+            toast.success("Income updated", {
+                description: `${updated.source} adjusted.`,
+            });
+        } else {
+            const newIncome: IncomeRecord = {
+                id: crypto.randomUUID ? crypto.randomUUID() : `inc-${Date.now()}`,
+                ...values,
+                amount: safeAmount,
+            };
+            setEntries((prev) => [newIncome, ...prev]);
+            toast.success("Income added", {
+                description: `${newIncome.source} added to your inflows.`,
+            });
+        }
+
+        setFormOpen(false);
+        setEditableIncome(null);
     };
 
     return (
@@ -138,8 +180,8 @@ const IncomePage = () => {
                 <div className="relative flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
                     <div className="space-y-3">
                         <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
-                            <Sparkles className="h-4 w-4" aria-hidden />
-                            Premium income view
+                            <LightbulbIcon className="h-4 w-4" aria-hidden />
+                            Manage you finances
                         </div>
                         <div>
                             <h1 className="text-3xl font-semibold text-foreground md:text-4xl">
@@ -181,7 +223,6 @@ const IncomePage = () => {
                 recurrence={recurrence}
                 onTimeframeChange={setTimeframe}
                 onRecurrenceChange={setRecurrence}
-                onReset={() => setEntries(incomeSeed)}
             />
 
             <div className="grid gap-4 md:grid-cols-3">
@@ -249,6 +290,16 @@ const IncomePage = () => {
             />
 
             <IncomeDetailsSheet income={selectedIncome} onClose={() => setSelectedIncome(null)} />
+            <IncomeFormSheet
+                open={formOpen}
+                mode={formMode}
+                income={editableIncome}
+                onClose={() => {
+                    setFormOpen(false);
+                    setEditableIncome(null);
+                }}
+                onSubmit={handleSubmitIncome}
+            />
         </div>
     );
 };
