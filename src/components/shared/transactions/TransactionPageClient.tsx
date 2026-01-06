@@ -23,42 +23,6 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog";
 
-const seedTransactions: TransactionRecord[] = [
-    {
-        id: "txn-001",
-        merchant: "Umucyo Grocery",
-        category: "Living",
-        amount: 54000,
-        date: "2025-01-04",
-        account: "Checking • 2841",
-        method: "Card",
-        status: "Cleared",
-        note: "Weekly staples",
-    },
-    {
-        id: "txn-002",
-        merchant: "Kigali Taxi",
-        category: "Travel",
-        amount: 18000,
-        date: "2025-01-05",
-        account: "Mobile Money",
-        method: "Mobile",
-        status: "Cleared",
-        note: "Airport drop",
-    },
-    {
-        id: "txn-003",
-        merchant: "Workspace Coffee",
-        category: "Work",
-        amount: 8500,
-        date: "2025-01-06",
-        account: "Business • 7710",
-        method: "Card",
-        status: "Pending",
-        note: "Client meeting",
-    },
-];
-
 export default function TransactionPageClient() {
     const [transactions, setTransactions] = useState<TransactionRecord[]>([]);
     const [selected, setSelected] = useState<TransactionRecord | null>(null);
@@ -89,9 +53,8 @@ export default function TransactionPageClient() {
             setTransactions(Array.isArray(body?.data) ? body.data : []);
         } catch (error) {
             console.error(error);
-            setTransactions(seedTransactions);
             toast.error("Could not load transactions", {
-                description: error instanceof Error ? error.message : "Using fallback data.",
+                description: error instanceof Error ? error.message : "Please try again.",
             });
         } finally {
             setLoading(false);
