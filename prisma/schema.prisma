@@ -21,6 +21,7 @@ model User {
   // relationships
   incomes   Income[]
   budgets   Budget[]
+  goals     Goal[]
   transactions Transaction[]
   @@map("users")
 }
