@@ -3,11 +3,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { CalendarDays, Loader2, ReceiptText, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { BudgetRecord, BudgetTransaction, formatCurrency, monthLabels } from "./types";
 
 type Props = {
     budget: BudgetRecord | null;
     onClose: () => void;
+    loading?: boolean;
 };
 
 type LoadedData = {
@@ -15,13 +17,13 @@ type LoadedData = {
     total: number;
 };
 
-export default function BudgetDetailsSheet({ budget, onClose }: Props) {
-    const [loading, setLoading] = useState(false);
+export default function BudgetDetailsSheet({ budget, onClose, loading = false }: Props) {
+    const [loadingTx, setLoadingTx] = useState(false);
     const [data, setData] = useState<LoadedData>({ transactions: [], total: 0 });
 
     useEffect(() => {
         if (!budget) return;
-        setLoading(true);
+        setLoadingTx(true);
         fetch(`/api/budgets/${budget.id}/transactions`, { cache: "no-store" })
             .then((res) => res.json().catch(() => null).then((body) => ({ ok: res.ok, body })))
             .then(({ ok, body }) => {
@@ -35,13 +37,57 @@ export default function BudgetDetailsSheet({ budget, onClose }: Props) {
             .catch(() => {
                 setData({ transactions: [], total: 0 });
             })
-            .finally(() => setLoading(false));
+            .finally(() => setLoadingTx(false));
     }, [budget]);
 
     const remaining = useMemo(() => {
         if (!budget) return 0;
         return budget.amount - (data.total || 0);
     }, [budget, data.total]);
+
+    if (!budget && !loading) return null;
+
+    if (loading) {
+        return (
+            <>
+                <div className="fixed inset-0 z-40 bg-black/30" onClick={onClose} aria-hidden />
+                <aside className="fixed inset-y-0 right-0 z-50 w-full max-w-lg transform border-l border-border/60 bg-card/95 shadow-xl backdrop-blur transition-transform duration-300">
+                    <div className="flex items-center justify-between border-b border-border/60 px-6 py-4">
+                        <div>
+                            <Skeleton className="h-4 w-24 rounded" />
+                            <Skeleton className="mt-1 h-3 w-32 rounded" />
+                        </div>
+                        <Skeleton className="h-9 w-16 rounded-md" />
+                    </div>
+                    <div className="space-y-4 px-6 py-6">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <Skeleton className="h-3 w-20 rounded" />
+                                <Skeleton className="mt-2 h-6 w-40 rounded" />
+                            </div>
+                            <Skeleton className="h-6 w-20 rounded-full" />
+                        </div>
+                        <div className="grid grid-cols-2 gap-3 rounded-2xl border border-border/60 bg-background/60 p-4">
+                            <Skeleton className="h-12 w-full rounded" />
+                            <Skeleton className="h-12 w-full rounded" />
+                        </div>
+                        <Skeleton className="h-12 w-full rounded-2xl" />
+                        <div className="space-y-3">
+                            <Skeleton className="h-3 w-24 rounded" />
+                            <div className="space-y-2 rounded-2xl border border-border/60 bg-background/60 p-4">
+                                {[...Array(3)].map((_, idx) => (
+                                    <div key={idx} className="space-y-2 rounded-xl border border-border/60 bg-background px-3 py-2">
+                                        <Skeleton className="h-4 w-32 rounded" />
+                                        <Skeleton className="h-3 w-40 rounded" />
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+            </>
+        );
+    }
 
     return (
         <>
@@ -148,7 +194,7 @@ export default function BudgetDetailsSheet({ budget, onClose }: Props) {
                                 </div>
 
                                 <div className="max-h-64 space-y-2 overflow-y-auto p-4">
-                                    {loading ? (
+                                    {loadingTx ? (
                                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                             <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
                                             Loading transactions...
