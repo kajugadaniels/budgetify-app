@@ -44,7 +44,6 @@ export async function PATCH(request: Request, props: { params: Params }) {
         where: { id },
         data: {
             ...data,
-            recurrence: data.recurrence === "One-time" ? "ONE_TIME" : "RECURRING",
         },
     });
 
