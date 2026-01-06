@@ -171,11 +171,11 @@ export default function BudgetDetailsSheet({ budget, onClose, loading = false }:
                             </p>
                         </div>
 
-                        <div className="space-y-3">
-                            <div className="flex items-center justify-between">
-                                <p className="text-xs uppercase tracking-[0.22em] text-muted-foreground">
-                                    Transactions
-                                </p>
+                    <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                            <p className="text-xs uppercase tracking-[0.22em] text-muted-foreground">
+                                Transactions
+                            </p>
                                 <span className="text-xs text-muted-foreground">
                                     {data.transactions.length} record{data.transactions.length === 1 ? "" : "s"}
                                 </span>
@@ -193,7 +193,7 @@ export default function BudgetDetailsSheet({ budget, onClose, loading = false }:
                                     </div>
                                 </div>
 
-                                <div className="max-h-64 space-y-2 overflow-y-auto p-4">
+                                <div className="max-h-72 space-y-2 overflow-y-auto p-4">
                                     {loadingTx ? (
                                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                             <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
@@ -205,18 +205,31 @@ export default function BudgetDetailsSheet({ budget, onClose, loading = false }:
                                                 key={txn.id}
                                                 className="rounded-xl border border-border/60 bg-background px-3 py-2"
                                             >
-                                                <div className="flex items-center justify-between gap-2">
-                                                    <div className="flex items-center gap-2">
-                                                        <ReceiptText className="h-4 w-4 text-primary" aria-hidden />
-                                                        <p className="text-sm font-semibold text-foreground">
-                                                            {txn.name}
+                                                <div className="flex items-start justify-between gap-2">
+                                                    <div className="space-y-1">
+                                                        <div className="flex items-center gap-2">
+                                                            <ReceiptText className="h-4 w-4 text-primary" aria-hidden />
+                                                            <p className="text-sm font-semibold text-foreground">
+                                                                {txn.merchant ?? txn.name ?? "Transaction"}
+                                                            </p>
+                                                        </div>
+                                                        <p className="text-xs text-muted-foreground">
+                                                            {txn.account ?? "No account"} • {txn.method ?? "—"}
                                                         </p>
                                                     </div>
-                                                    <p className="text-sm font-semibold text-foreground">
-                                                        {formatCurrency(txn.amount)}
-                                                    </p>
+                                                    <div className="text-right">
+                                                        <p className="text-sm font-semibold text-foreground">
+                                                            {formatCurrency(txn.amount)}
+                                                        </p>
+                                                        <span
+                                                            className="mt-1 inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-semibold text-primary"
+                                                        >
+                                                            <span className="h-1.5 w-1.5 rounded-full bg-current" />
+                                                            {txn.status ?? "Cleared"}
+                                                        </span>
+                                                    </div>
                                                 </div>
-                                                <div className="mt-1 flex items-center justify-between text-xs text-muted-foreground">
+                                                <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
                                                     <div className="flex items-center gap-1">
                                                         <CalendarDays className="h-3.5 w-3.5" aria-hidden />
                                                         <span>
@@ -225,8 +238,15 @@ export default function BudgetDetailsSheet({ budget, onClose, loading = false }:
                                                                 : "No date"}
                                                         </span>
                                                     </div>
-                                                    {txn.note ? <span>{txn.note}</span> : null}
+                                                    {txn.category ? (
+                                                        <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium text-foreground">
+                                                            {txn.category}
+                                                        </span>
+                                                    ) : null}
                                                 </div>
+                                                {txn.note ? (
+                                                    <p className="mt-1 text-xs text-muted-foreground">{txn.note}</p>
+                                                ) : null}
                                             </div>
                                         ))
                                     ) : (

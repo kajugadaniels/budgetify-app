@@ -31,7 +31,12 @@ export type BudgetFilters = {
 export type BudgetTransaction = {
     id: string;
     budgetId: string;
-    name: string;
+    merchant?: string;
+    name?: string;
+    category?: string;
+    account?: string;
+    method?: "Card" | "Cash" | "Transfer" | "Mobile";
+    status?: "Cleared" | "Pending" | "Flagged";
     amount: number;
     date: string;
     note?: string;
