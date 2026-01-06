@@ -139,6 +139,20 @@ export async function POST(req: Request, props: Params) {
                 amount: new Prisma.Decimal(amountValue),
                 date: parsedDate,
                 note,
+                goalId: body?.addToGoal
+                    ? (
+                        await tx.goal.create({
+                            data: {
+                                userId: dbUser.id,
+                                name: merchant,
+                                amount: new Prisma.Decimal(amountValue),
+                                status: "COMPLETED",
+                                targetDate: parsedDate,
+                                note,
+                            },
+                        })
+                    ).id
+                    : null,
             },
         });
 

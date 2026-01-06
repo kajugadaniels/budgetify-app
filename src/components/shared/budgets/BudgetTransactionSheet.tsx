@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { BudgetRecord, BudgetTransaction, formatCurrency, monthLabels } from "./types";
+import { Switch } from "@/components/ui/switch";
 
 type Props = {
     budget: BudgetRecord | null;
@@ -25,6 +26,7 @@ type FormState = {
     category: string;
     method: "Card" | "Cash" | "Transfer" | "Mobile";
     status: "Cleared" | "Pending" | "Flagged";
+    addToGoal: boolean;
 };
 
 const defaultFormState = (): FormState => ({
@@ -36,6 +38,7 @@ const defaultFormState = (): FormState => ({
     category: "General",
     method: "Card",
     status: "Cleared",
+    addToGoal: false,
 });
 
 export default function BudgetTransactionSheet({ budget, open, onClose, onCreated }: Props) {
@@ -85,16 +88,17 @@ export default function BudgetTransactionSheet({ budget, open, onClose, onCreate
             const response = await fetch(`/api/budgets/${budget.id}/transactions`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        merchant: form.merchant.trim(),
-                        category: form.category || budget.category,
-                        account: form.account,
-                        method: form.method,
-                        status: form.status,
-                        amount: Number(form.amount),
-                        date: form.date,
-                        note: form.note.trim(),
-                    }),
+                body: JSON.stringify({
+                    merchant: form.merchant.trim(),
+                    category: form.category || budget.category,
+                    account: form.account,
+                    method: form.method,
+                    status: form.status,
+                    amount: Number(form.amount),
+                    date: form.date,
+                    note: form.note.trim(),
+                    addToGoal: form.addToGoal,
+                }),
             });
             const body = await response.json().catch(() => null);
             if (!response.ok) throw new Error(body?.error ?? "Unable to add transaction.");
@@ -130,11 +134,11 @@ export default function BudgetTransactionSheet({ budget, open, onClose, onCreate
                     </DialogDescription>
                 </DialogHeader>
 
-        <div className="rounded-2xl border border-border/60 bg-muted/20 p-4">
-            <div className="flex items-center justify-between gap-4">
-                <div>
-                    <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Planned</p>
-                    <p className="text-xl font-semibold text-foreground">
+                <div className="rounded-2xl border border-border/60 bg-muted/20 p-4">
+                    <div className="flex items-center justify-between gap-4">
+                        <div>
+                            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Planned</p>
+                            <p className="text-xl font-semibold text-foreground">
                         {formatCurrency(totals.planned)}
                             </p>
                             <p className="text-xs text-muted-foreground">
@@ -158,6 +162,24 @@ export default function BudgetTransactionSheet({ budget, open, onClose, onCreate
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
+                    <div className="flex items-center justify-between rounded-xl border border-border/60 bg-background/60 px-4 py-3">
+                        <div>
+                            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+                                Also track as goal
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                                Creates a completed goal using this transaction data.
+                            </p>
+                        </div>
+                        <Switch
+                            checked={form.addToGoal}
+                            onCheckedChange={(checked) =>
+                                setForm((prev) => ({ ...prev, addToGoal: checked }))
+                            }
+                            aria-label="Toggle create goal"
+                        />
+                    </div>
+
                     <div className="grid gap-4 md:grid-cols-2">
                         <div className="space-y-2">
                             <Label className="text-sm font-semibold text-foreground">Merchant</Label>
