@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
-import { Prisma } from "@prisma/client";
+import { Prisma, type Budget, type Transaction } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { resolveAuthenticatedUser } from "../../../incomes/helpers";
 
 type Params = { params: { id?: string } } | Promise<{ params: { id?: string } }>;
 
-const mapBudget = (budget: any) => ({
+const mapBudget = (budget: Budget) => ({
     id: budget.id,
     name: budget.name,
     category: budget.category,
@@ -18,7 +18,7 @@ const mapBudget = (budget: any) => ({
     updatedAt: budget.updatedAt,
 });
 
-const mapTransaction = (txn: any) => ({
+const mapTransaction = (txn: Transaction) => ({
     id: txn.id,
     budgetId: txn.budgetId ?? undefined,
     merchant: txn.merchant,
