@@ -7,9 +7,10 @@ const isPublicRoute = createRouteMatcher([
     "/sign-out(.*)",
 ]);
 
-export default clerkMiddleware((auth, req) => {
+export default clerkMiddleware(async (auth, req) => {
     if (isPublicRoute(req)) return;
-    auth().protect();
+    const session = await auth();
+    session.protect();
 });
 
 export const config = {
