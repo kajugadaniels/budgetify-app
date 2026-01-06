@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import { Prisma } from "@prisma/client";
+import { Prisma, type Budget } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { resolveAuthenticatedUser } from "../../incomes/helpers";
 
-const mapBudget = (budget: any) => ({
+const mapBudget = (budget: Budget) => ({
     id: budget.id,
     name: budget.name,
     category: budget.category,
