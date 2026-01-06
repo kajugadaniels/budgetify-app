@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { LightbulbIcon, Loader2, Plus } from "lucide-react";
+import { LightbulbIcon, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import TransactionTable from "./TransactionTable";
@@ -64,13 +64,6 @@ export default function TransactionPageClient() {
     useEffect(() => {
         void fetchTransactions();
     }, [fetchTransactions]);
-
-    const handleAdd = () => {
-        setFormMode("create");
-        setEditable(null);
-        setSelected(null);
-        setFormOpen(true);
-    };
 
     const handleEdit = (txn: TransactionRecord) => {
         setFormMode("edit");
