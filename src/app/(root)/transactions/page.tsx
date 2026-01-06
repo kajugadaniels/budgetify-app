@@ -1,11 +1,5 @@
-import React from 'react'
+import TransactionPageClient from "@/components/shared/transactions/TransactionPageClient";
 
-const TransactionsPage = () => {
-    return (
-        <div>
-            Transactions Page
-        </div>
-    )
+export default function TransactionsPage() {
+    return <TransactionPageClient />;
 }
-
-export default TransactionsPage
