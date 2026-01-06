@@ -55,7 +55,7 @@ const CategoryBreakdownPie = ({ data, loading = false }: CategoryBreakdownPiePro
                         ))}
                     </Pie>
                     <Tooltip
-                        formatter={(value: number) => currencyFormatter(value)}
+                        formatter={(value) => currencyFormatter(typeof value === "number" ? value : 0)}
                         contentStyle={{ borderRadius: 12 }}
                     />
                     <Legend />
