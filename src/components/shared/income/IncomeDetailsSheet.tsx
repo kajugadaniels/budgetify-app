@@ -4,10 +4,12 @@ import React from "react";
 import { CalendarClock, CreditCard, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { IncomeRecord, formatCurrency, formatDate } from "./types";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type IncomeDetailsSheetProps = {
     income: IncomeRecord | null;
     onClose: () => void;
+    loading?: boolean;
 };
 
 const metadata: { label: string; key: keyof IncomeRecord; icon?: React.ElementType }[] = [
@@ -20,8 +22,50 @@ const metadata: { label: string; key: keyof IncomeRecord; icon?: React.ElementTy
     { label: "Account", key: "account" },
 ];
 
-const IncomeDetailsSheet = ({ income, onClose }: IncomeDetailsSheetProps) => {
-    if (!income) return null;
+const IncomeDetailsSheet = ({ income, onClose, loading = false }: IncomeDetailsSheetProps) => {
+    if (!income && !loading) return null;
+
+    if (loading) {
+        return (
+            <div
+                className="fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-sm"
+                onClick={onClose}
+            >
+                <div
+                    className="h-full w-full max-w-md border-l border-border/60 bg-card/95 px-6 py-6 shadow-2xl shadow-black/25 transition-transform duration-200 ease-out"
+                    onClick={(event) => event.stopPropagation()}
+                >
+                    <div className="flex items-start justify-between gap-3">
+                        <div className="space-y-2">
+                            <Skeleton className="h-3 w-24 rounded" />
+                            <Skeleton className="h-6 w-48 rounded" />
+                            <Skeleton className="h-4 w-60 rounded" />
+                        </div>
+                        <Skeleton className="h-10 w-10 rounded-full" />
+                    </div>
+                    <div className="mt-6 rounded-2xl border border-border/60 bg-background/80 px-5 py-4 space-y-2">
+                        <Skeleton className="h-3 w-28 rounded" />
+                        <Skeleton className="h-8 w-32 rounded" />
+                        <Skeleton className="h-3 w-24 rounded" />
+                    </div>
+                    <div className="mt-6 space-y-3">
+                        {[...Array(5)].map((_, index) => (
+                            <div
+                                key={index}
+                                className="flex items-start justify-between gap-4 rounded-xl border border-border/60 px-4 py-3"
+                            >
+                                <div className="flex items-center gap-2 text-muted-foreground">
+                                    <Skeleton className="h-4 w-4 rounded-full" />
+                                    <Skeleton className="h-3 w-20 rounded" />
+                                </div>
+                                <Skeleton className="h-4 w-28 rounded" />
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div
