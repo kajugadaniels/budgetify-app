@@ -162,7 +162,7 @@ export default function TransactionPageClient() {
                             </span>
                         </div>
                     </div>
-                    <div className="flex flex-wrap items-center gap-3">
+                    {/* <div className="flex flex-wrap items-center gap-3">
                         <Button
                             type="button"
                             variant="outline"
@@ -172,7 +172,7 @@ export default function TransactionPageClient() {
                             <Plus className="h-4 w-4" aria-hidden />
                             Add transaction
                         </Button>
-                    </div>
+                    </div> */}
                 </div>
             </section>
 
