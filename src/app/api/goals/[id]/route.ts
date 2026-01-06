@@ -46,7 +46,7 @@ export async function PATCH(request: Request, props: { params: Params }) {
         where: { id },
         data: {
             ...data,
-            status: data.status.toUpperCase() as any,
+            status: data.status,
         },
     });
 
