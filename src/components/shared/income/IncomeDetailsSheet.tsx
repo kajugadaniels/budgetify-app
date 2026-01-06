@@ -67,6 +67,8 @@ const IncomeDetailsSheet = ({ income, onClose, loading = false }: IncomeDetailsS
         );
     }
 
+    if (!income) return null;
+
     return (
         <div
             className="fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-sm"
