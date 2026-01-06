@@ -121,7 +121,9 @@ const IncomePage = () => {
             .reduce((sum, income) => sum + income.amount, 0);
         const nextDate = filteredEntries
             .map((income) => (income.nextPayout ? new Date(income.nextPayout) : null))
-            .filter((date): date is Date => Boolean(date) && !Number.isNaN(date.getTime()))
+            .filter(
+                (date): date is Date => date instanceof Date && !Number.isNaN(date.getTime())
+            )
             .sort((a, b) => a.getTime() - b.getTime())[0];
 
         return {
