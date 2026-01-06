@@ -46,7 +46,9 @@ const CategoryBreakdownPie = ({ data, loading = false }: CategoryBreakdownPiePro
                         cx="50%"
                         cy="50%"
                         outerRadius={110}
-                        label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                        label={({ name, percent }) =>
+                            `${name}: ${(((percent ?? 0) as number) * 100).toFixed(0)}%`
+                        }
                     >
                         {data.map((entry, index) => (
                             <Cell key={entry.name} fill={palette[index % palette.length]} />
