@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { Prisma, TransactionMethod, TransactionStatus, type Transaction } from "@prisma/client";
 import { currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
@@ -10,25 +10,25 @@ type ParsedTransaction = {
     amount: Prisma.Decimal;
     date: Date;
     account: string;
-    method: "Card" | "Cash" | "Transfer" | "Mobile";
-    status: "Cleared" | "Pending" | "Flagged";
+    method: TransactionMethod;
+    status: TransactionStatus;
     note?: string | null;
     budgetId?: string | null;
     goalId?: string | null;
 };
 
-const methodMap = {
-    Card: "CARD",
-    Cash: "CASH",
-    Transfer: "TRANSFER",
-    Mobile: "MOBILE",
-} as const;
+const methodLabels: Record<TransactionMethod, TransactionRecord["method"]> = {
+    [TransactionMethod.CARD]: "Card",
+    [TransactionMethod.CASH]: "Cash",
+    [TransactionMethod.TRANSFER]: "Transfer",
+    [TransactionMethod.MOBILE]: "Mobile",
+};
 
-const statusMap = {
-    Cleared: "CLEARED",
-    Pending: "PENDING",
-    Flagged: "FLAGGED",
-} as const;
+const statusLabels: Record<TransactionStatus, TransactionRecord["status"]> = {
+    [TransactionStatus.CLEARED]: "Cleared",
+    [TransactionStatus.PENDING]: "Pending",
+    [TransactionStatus.FLAGGED]: "Flagged",
+};
 
 export async function resolveAuthenticatedUser() {
     const user = await currentUser();
@@ -58,7 +58,7 @@ export async function resolveAuthenticatedUser() {
     return dbUser;
 }
 
-export function serializeTransaction(txn: any): TransactionRecord {
+export function serializeTransaction(txn: Transaction): TransactionRecord {
     return {
         id: txn.id,
         merchant: txn.merchant,
@@ -66,51 +66,51 @@ export function serializeTransaction(txn: any): TransactionRecord {
         amount: Number(txn.amount ?? 0),
         date: txn.date instanceof Date ? txn.date.toISOString() : txn.date,
         account: txn.account,
-        method: txn.method === "CASH" ? "Cash"
-            : txn.method === "TRANSFER" ? "Transfer"
-                : txn.method === "MOBILE" ? "Mobile"
-                    : "Card",
-        status: txn.status === "PENDING" ? "Pending" : txn.status === "FLAGGED" ? "Flagged" : "Cleared",
+        method: methodLabels[txn.method],
+        status: statusLabels[txn.status],
         note: txn.note ?? undefined,
         goalId: txn.goalId ?? undefined,
     };
 }
 
-export function parseTransactionPayload(payload: any) {
+export function parseTransactionPayload(payload: unknown) {
     if (!payload || typeof payload !== "object") {
         return { error: "Invalid payload." };
     }
 
+    const input = payload as Record<string, unknown>;
     const errors: string[] = [];
 
-    const merchant = typeof payload.merchant === "string" ? payload.merchant.trim() : "";
-    const category = typeof payload.category === "string" ? payload.category.trim() : "";
-    const account = typeof payload.account === "string" ? payload.account.trim() : "";
+    const merchant = typeof input.merchant === "string" ? input.merchant.trim() : "";
+    const category = typeof input.category === "string" ? input.category.trim() : "";
+    const account = typeof input.account === "string" ? input.account.trim() : "";
+    const methodInput = typeof input.method === "string" ? input.method : "Card";
+    const statusInput = typeof input.status === "string" ? input.status : "Cleared";
     const method: ParsedTransaction["method"] =
-        payload.method === "Cash"
-            ? "Cash"
-            : payload.method === "Transfer"
-                ? "Transfer"
-                : payload.method === "Mobile"
-                    ? "Mobile"
-                    : "Card";
+        methodInput === "Cash" || methodInput === "CASH"
+            ? TransactionMethod.CASH
+            : methodInput === "Transfer" || methodInput === "TRANSFER"
+                ? TransactionMethod.TRANSFER
+                : methodInput === "Mobile" || methodInput === "MOBILE"
+                    ? TransactionMethod.MOBILE
+                    : TransactionMethod.CARD;
     const status: ParsedTransaction["status"] =
-        payload.status === "Pending"
-            ? "Pending"
-            : payload.status === "Flagged"
-                ? "Flagged"
-                : "Cleared";
+        statusInput === "Pending" || statusInput === "PENDING"
+            ? TransactionStatus.PENDING
+            : statusInput === "Flagged" || statusInput === "FLAGGED"
+                ? TransactionStatus.FLAGGED
+                : TransactionStatus.CLEARED;
 
-    const date = typeof payload.date === "string" ? payload.date : "";
-    const amountNumber = Number(payload.amount);
-    const note = typeof payload.note === "string" ? payload.note.trim() : undefined;
+    const date = typeof input.date === "string" ? input.date : "";
+    const amountNumber = Number(input.amount);
+    const note = typeof input.note === "string" ? input.note.trim() : undefined;
     const budgetId =
-        payload.budgetId && typeof payload.budgetId === "string" && payload.budgetId.length
-            ? payload.budgetId
+        input.budgetId && typeof input.budgetId === "string" && input.budgetId.length
+            ? input.budgetId
             : null;
     const goalId =
-        payload.goalId && typeof payload.goalId === "string" && payload.goalId.length
-            ? payload.goalId
+        input.goalId && typeof input.goalId === "string" && input.goalId.length
+            ? input.goalId
             : null;
 
     if (!merchant) errors.push("Merchant is required.");
