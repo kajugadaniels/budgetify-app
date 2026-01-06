@@ -45,7 +45,7 @@ const PaymentMethodBar = ({ data, loading = false }: PaymentMethodBarProps) => {
                         width={80}
                     />
                     <Tooltip
-                        formatter={(value: number) => currencyFormatter(value)}
+                        formatter={(value) => currencyFormatter(typeof value === "number" ? value : 0)}
                         contentStyle={{ borderRadius: 12 }}
                     />
                     <Bar dataKey="value" name="Amount" fill="#6366f1" radius={[6, 6, 0, 0]} />
