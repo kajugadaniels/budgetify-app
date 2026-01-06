@@ -13,17 +13,16 @@ type Props = {
 };
 
 type LoadedData = {
+    budgetId: string;
     transactions: BudgetTransaction[];
     total: number;
 };
 
 export default function BudgetDetailsSheet({ budget, onClose, loading = false }: Props) {
-    const [loadingTx, setLoadingTx] = useState(false);
-    const [data, setData] = useState<LoadedData>({ transactions: [], total: 0 });
+    const [data, setData] = useState<LoadedData | null>(null);
 
     useEffect(() => {
         if (!budget) return;
-        setLoadingTx(true);
         fetch(`/api/budgets/${budget.id}/transactions`, { cache: "no-store" })
             .then((res) => res.json().catch(() => null).then((body) => ({ ok: res.ok, body })))
             .then(({ ok, body }) => {
@@ -32,18 +31,21 @@ export default function BudgetDetailsSheet({ budget, onClose, loading = false }:
                     ? body.data.transactions
                     : [];
                 const total = txns.reduce((sum: number, txn: BudgetTransaction) => sum + txn.amount, 0);
-                setData({ transactions: txns, total });
+                setData({ budgetId: budget.id, transactions: txns, total });
             })
             .catch(() => {
-                setData({ transactions: [], total: 0 });
-            })
-            .finally(() => setLoadingTx(false));
+                setData({ budgetId: budget.id, transactions: [], total: 0 });
+            });
     }, [budget]);
 
+    const activeData = budget && data?.budgetId === budget.id ? data : null;
+    const loadingTx = Boolean(budget) && !activeData;
+    const transactions = activeData?.transactions ?? [];
+    const totalSpent = activeData?.total ?? 0;
     const remaining = useMemo(() => {
         if (!budget) return 0;
-        return budget.amount - (data.total || 0);
-    }, [budget, data.total]);
+        return budget.amount - (activeData?.total ?? 0);
+    }, [activeData?.total, budget]);
 
     if (!budget && !loading) return null;
 
@@ -177,7 +179,7 @@ export default function BudgetDetailsSheet({ budget, onClose, loading = false }:
                                 Transactions
                             </p>
                                 <span className="text-xs text-muted-foreground">
-                                    {data.transactions.length} record{data.transactions.length === 1 ? "" : "s"}
+                                    {transactions.length} record{transactions.length === 1 ? "" : "s"}
                                 </span>
                             </div>
                             <div className="rounded-2xl border border-border/60 bg-background/60">
@@ -185,7 +187,7 @@ export default function BudgetDetailsSheet({ budget, onClose, loading = false }:
                                     <div className="flex items-center gap-2">
                                         <Wallet className="h-4 w-4 text-primary" aria-hidden />
                                         <span className="text-sm font-semibold text-foreground">
-                                            Spent {formatCurrency(data.total)}
+                                            Spent {formatCurrency(totalSpent)}
                                         </span>
                                     </div>
                                     <div className="text-sm text-muted-foreground">
@@ -199,8 +201,8 @@ export default function BudgetDetailsSheet({ budget, onClose, loading = false }:
                                             <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
                                             Loading transactions...
                                         </div>
-                                    ) : data.transactions.length ? (
-                                        data.transactions.map((txn) => (
+                                    ) : transactions.length ? (
+                                        transactions.map((txn) => (
                                             <div
                                                 key={txn.id}
                                                 className="rounded-xl border border-border/60 bg-background px-3 py-2"
