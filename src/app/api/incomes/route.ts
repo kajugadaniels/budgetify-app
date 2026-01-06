@@ -31,7 +31,6 @@ export async function POST(request: Request) {
     const income = await prisma.income.create({
         data: {
             ...data,
-            recurrence: data.recurrence === "One-time" ? "ONE_TIME" : "RECURRING",
             userId: dbUser.id,
         },
     });
