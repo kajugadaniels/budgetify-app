@@ -24,6 +24,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const seedBudgets: BudgetRecord[] = [
     {
@@ -260,9 +261,13 @@ export default function BudgetPageClient() {
                             <p className="text-xs uppercase tracking-[0.22em] text-muted-foreground">
                                 Planned
                             </p>
-                            <p className="mt-2 text-3xl font-semibold text-foreground">
-                                {formatCurrency(totals.planned)}
-                            </p>
+                            {loading ? (
+                                <Skeleton className="mt-2 h-8 w-28 rounded" />
+                            ) : (
+                                <p className="mt-2 text-3xl font-semibold text-foreground">
+                                    {formatCurrency(totals.planned)}
+                                </p>
+                            )}
                         </div>
                         <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
                             <Wallet2 className="h-5 w-5" aria-hidden />
@@ -278,9 +283,13 @@ export default function BudgetPageClient() {
                             <p className="text-xs uppercase tracking-[0.22em] text-muted-foreground">
                                 Spent
                             </p>
-                            <p className="mt-2 text-3xl font-semibold text-foreground">
-                                {formatCurrency(totals.spent)}
-                            </p>
+                            {loading ? (
+                                <Skeleton className="mt-2 h-8 w-28 rounded" />
+                            ) : (
+                                <p className="mt-2 text-3xl font-semibold text-foreground">
+                                    {formatCurrency(totals.spent)}
+                                </p>
+                            )}
                         </div>
                         <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
                             <Target className="h-5 w-5" aria-hidden />
@@ -296,9 +305,13 @@ export default function BudgetPageClient() {
                             <p className="text-xs uppercase tracking-[0.22em] text-muted-foreground">
                                 Remaining
                             </p>
-                            <p className="mt-2 text-3xl font-semibold text-foreground">
-                                {formatCurrency(totals.remaining)}
-                            </p>
+                            {loading ? (
+                                <Skeleton className="mt-2 h-8 w-32 rounded" />
+                            ) : (
+                                <p className="mt-2 text-3xl font-semibold text-foreground">
+                                    {formatCurrency(totals.remaining)}
+                                </p>
+                            )}
                         </div>
                         <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
                             <LightbulbIcon className="h-5 w-5" aria-hidden />
@@ -312,13 +325,18 @@ export default function BudgetPageClient() {
 
             <BudgetTable
                 data={filteredBudgets}
+                loading={loading}
                 onView={setSelectedBudget}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
                 onAddTransaction={handleAddTransaction}
             />
 
-            <BudgetDetailsSheet budget={selectedBudget} onClose={() => setSelectedBudget(null)} />
+            <BudgetDetailsSheet
+                budget={selectedBudget}
+                loading={loading && Boolean(selectedBudget)}
+                onClose={() => setSelectedBudget(null)}
+            />
             <BudgetFormSheet
                 open={formOpen}
                 mode={formMode}
@@ -340,6 +358,7 @@ export default function BudgetPageClient() {
                     setEditableBudget(null);
                 }}
                 onSubmit={handleSubmit}
+                loading={loading}
             />
 
             <BudgetTransactionSheet
