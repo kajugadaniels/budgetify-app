@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 import { Prisma, type Budget } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { resolveAuthenticatedUser } from "../../incomes/helpers";
@@ -17,15 +17,16 @@ const mapBudget = (budget: Budget) => ({
 });
 
 type Params = {
-    params: { id: string };
+    params: Promise<{ id: string }>;
 };
 
-export async function GET(_: Request, { params }: Params) {
+export async function GET(_: NextRequest, { params }: Params) {
     const dbUser = await resolveAuthenticatedUser();
     if (!dbUser) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+    const { id } = await params;
     const budget = await prisma.budget.findFirst({
-        where: { id: params.id, userId: dbUser.id },
+        where: { id, userId: dbUser.id },
     });
 
     if (!budget) {
@@ -35,12 +36,13 @@ export async function GET(_: Request, { params }: Params) {
     return NextResponse.json({ data: mapBudget(budget) });
 }
 
-export async function PATCH(req: Request, { params }: Params) {
+export async function PATCH(req: NextRequest, { params }: Params) {
     const dbUser = await resolveAuthenticatedUser();
     if (!dbUser) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+    const { id } = await params;
     const existing = await prisma.budget.findFirst({
-        where: { id: params.id, userId: dbUser.id },
+        where: { id, userId: dbUser.id },
     });
     if (!existing) {
         return NextResponse.json({ error: "Budget not found." }, { status: 404 });
@@ -57,7 +59,7 @@ export async function PATCH(req: Request, { params }: Params) {
 
     try {
         const budget = await prisma.budget.update({
-            where: { id: params.id },
+            where: { id },
             data: {
                 ...(name !== undefined ? { name } : {}),
                 ...(category !== undefined ? { category } : {}),
@@ -86,21 +88,22 @@ export async function PATCH(req: Request, { params }: Params) {
     }
 }
 
-export async function DELETE(_: Request, { params }: Params) {
+export async function DELETE(_: NextRequest, { params }: Params) {
     const dbUser = await resolveAuthenticatedUser();
     if (!dbUser) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+    const { id } = await params;
     const existing = await prisma.budget.findFirst({
-        where: { id: params.id, userId: dbUser.id },
+        where: { id, userId: dbUser.id },
     });
     if (!existing) {
         return NextResponse.json({ error: "Budget not found." }, { status: 404 });
     }
 
     await prisma.$transaction(async (tx) => {
-        await tx.transaction.deleteMany({ where: { budgetId: params.id } });
-        await tx.budget.delete({ where: { id: params.id } });
+        await tx.transaction.deleteMany({ where: { budgetId: id } });
+        await tx.budget.delete({ where: { id } });
     });
 
-    return NextResponse.json({ data: { id: params.id } });
+    return NextResponse.json({ data: { id } });
 }
