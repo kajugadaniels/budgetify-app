@@ -47,7 +47,7 @@ const MonthlyFlowChart = ({ data, loading = false }: MonthlyFlowChartProps) => {
                         width={80}
                     />
                     <Tooltip
-                        formatter={(value: number) => currencyFormatter(value)}
+                        formatter={(value) => currencyFormatter(typeof value === "number" ? value : 0)}
                         labelFormatter={(label) => `Day ${label}`}
                         contentStyle={{ borderRadius: 12 }}
                     />
