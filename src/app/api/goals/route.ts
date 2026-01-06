@@ -32,7 +32,7 @@ export async function POST(request: Request) {
         data: {
             ...data,
             userId: dbUser.id,
-            status: data.status.toUpperCase() as any,
+            status: data.status,
         },
     });
 
