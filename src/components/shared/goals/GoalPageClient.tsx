@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Flag, LightbulbIcon, Loader2, Plus, Sparkles } from "lucide-react";
+import { Flag, Loader2, Plus, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import GoalTable from "./GoalTable";
