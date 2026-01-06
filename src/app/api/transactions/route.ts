@@ -33,8 +33,8 @@ export async function POST(request: Request) {
         data: {
             ...data,
             userId: dbUser.id,
-            method: data.method ? data.method.toUpperCase() as any : undefined,
-            status: data.status ? data.status.toUpperCase() as any : undefined,
+            method: data.method,
+            status: data.status,
         },
     });
 
