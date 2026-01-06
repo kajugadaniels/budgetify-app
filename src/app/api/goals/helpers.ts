@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { GoalStatus, Prisma, type Goal } from "@prisma/client";
 import { currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
@@ -7,7 +7,7 @@ import { GoalRecord } from "@/components/shared/goals/types";
 type ParsedGoal = {
     name: string;
     amount: Prisma.Decimal;
-    status: "Planning" | "Active" | "Completed" | "Paused";
+    status: GoalStatus;
     targetDate: Date | null;
     note?: string | null;
 };
@@ -40,48 +40,50 @@ export async function resolveAuthenticatedUser() {
     return dbUser;
 }
 
-export function serializeGoal(goal: any): GoalRecord {
+const goalStatusLabels: Record<GoalStatus, GoalRecord["status"]> = {
+    [GoalStatus.PLANNING]: "Planning",
+    [GoalStatus.ACTIVE]: "Active",
+    [GoalStatus.COMPLETED]: "Completed",
+    [GoalStatus.PAUSED]: "Paused",
+};
+
+export function serializeGoal(goal: Goal): GoalRecord {
     return {
         id: goal.id,
         name: goal.name,
         amount: Number(goal.amount ?? 0),
-        status:
-            goal.status === "ACTIVE"
-                ? "Active"
-                : goal.status === "COMPLETED"
-                    ? "Completed"
-                    : goal.status === "PAUSED"
-                        ? "Paused"
-                        : "Planning",
+        status: goalStatusLabels[goal.status],
         targetDate: goal.targetDate instanceof Date ? goal.targetDate.toISOString() : goal.targetDate,
         note: goal.note ?? undefined,
     };
 }
 
-export function parseGoalPayload(payload: any) {
+export function parseGoalPayload(payload: unknown) {
     if (!payload || typeof payload !== "object") {
         return { error: "Invalid payload." };
     }
 
+    const input = payload as Record<string, unknown>;
     const errors: string[] = [];
 
-    const name = typeof payload.name === "string" ? payload.name.trim() : "";
-    const amountNumber = Number(payload.amount);
-    const statusInput = typeof payload.status === "string" ? payload.status : "Planning";
-    const targetDateInput = typeof payload.targetDate === "string" ? payload.targetDate : "";
-    const note = typeof payload.note === "string" ? payload.note.trim() : undefined;
+    const name = typeof input.name === "string" ? input.name.trim() : "";
+    const amountNumber = Number(input.amount);
+    const statusInput = typeof input.status === "string" ? input.status : "Planning";
+    const targetDateInput = typeof input.targetDate === "string" ? input.targetDate : "";
+    const note = typeof input.note === "string" ? input.note.trim() : undefined;
 
     if (!name) errors.push("Name is required.");
     if (!Number.isFinite(amountNumber) || amountNumber <= 0) errors.push("Amount must be greater than zero.");
 
+    const statusKey = statusInput.toLowerCase();
     const status: ParsedGoal["status"] =
-        statusInput === "Active"
-            ? "Active"
-            : statusInput === "Completed"
-                ? "Completed"
-                : statusInput === "Paused"
-                    ? "Paused"
-                    : "Planning";
+        statusKey === "active"
+            ? GoalStatus.ACTIVE
+            : statusKey === "completed"
+                ? GoalStatus.COMPLETED
+                : statusKey === "paused"
+                    ? GoalStatus.PAUSED
+                    : GoalStatus.PLANNING;
 
     let targetDate: Date | null = null;
     if (targetDateInput) {
