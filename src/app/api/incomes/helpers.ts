@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { IncomeRecurrence, Prisma, type Income } from "@prisma/client";
 import { currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
@@ -7,7 +7,7 @@ import { IncomeRecord } from "@/components/shared/income/types";
 type ParsedIncome = {
     source: string;
     category: string;
-    recurrence: "Recurring" | "One-time";
+    recurrence: IncomeRecurrence;
     cadence: string;
     paidOn: Date;
     nextPayout: Date | null;
@@ -19,7 +19,7 @@ type ParsedIncome = {
     year?: number | null;
 };
 
-export function serializeIncome(income: any): IncomeRecord {
+export function serializeIncome(income: Income): IncomeRecord {
     return {
         id: income.id,
         source: income.source,
@@ -65,25 +65,31 @@ export async function resolveAuthenticatedUser() {
     return dbUser;
 }
 
-export function parseIncomePayload(payload: any) {
+export function parseIncomePayload(payload: unknown) {
     if (!payload || typeof payload !== "object") {
         return { error: "Invalid payload." };
     }
 
+    const input = payload as Record<string, unknown>;
     const errors: string[] = [];
 
-    const source = typeof payload.source === "string" ? payload.source.trim() : "";
-    const category = typeof payload.category === "string" ? payload.category.trim() : "";
-    const cadence = typeof payload.cadence === "string" ? payload.cadence.trim() : "";
-    const recurrence = payload.recurrence === "One-time" ? "One-time" : "Recurring";
-    const paidOn = typeof payload.paidOn === "string" ? payload.paidOn : "";
+    const source = typeof input.source === "string" ? input.source.trim() : "";
+    const category = typeof input.category === "string" ? input.category.trim() : "";
+    const cadence = typeof input.cadence === "string" ? input.cadence.trim() : "";
+    const recurrenceInput =
+        typeof input.recurrence === "string" ? input.recurrence : "Recurring";
+    const recurrence =
+        recurrenceInput === "One-time" || recurrenceInput === "ONE_TIME"
+            ? IncomeRecurrence.ONE_TIME
+            : IncomeRecurrence.RECURRING;
+    const paidOn = typeof input.paidOn === "string" ? input.paidOn : "";
     const nextPayout =
-        typeof payload.nextPayout === "string" && payload.nextPayout.length
-            ? payload.nextPayout
+        typeof input.nextPayout === "string" && input.nextPayout.length
+            ? input.nextPayout
             : null;
-    const note = typeof payload.note === "string" ? payload.note.trim() : undefined;
-    const account = typeof payload.account === "string" ? payload.account.trim() : undefined;
-    const amountNumber = Number(payload.amount);
+    const note = typeof input.note === "string" ? input.note.trim() : undefined;
+    const account = typeof input.account === "string" ? input.account.trim() : undefined;
+    const amountNumber = Number(input.amount);
 
     if (!source) errors.push("Source is required.");
     if (!category) errors.push("Category is required.");
@@ -97,7 +103,7 @@ export function parseIncomePayload(payload: any) {
     if (Number.isNaN(parsedPaidOn.getTime())) errors.push("Date received must be a valid date.");
 
     let parsedNextPayout: Date | null = null;
-    if (recurrence === "Recurring") {
+    if (recurrence === IncomeRecurrence.RECURRING) {
         if (!nextPayout) {
             errors.push("Next payout date is required for recurring incomes.");
         } else {
