@@ -20,11 +20,20 @@ type RouteContext = {
     params: Promise<{ id: string }>;
 };
 
-export async function GET(_: NextRequest, { params }: RouteContext) {
+type LegacyRouteContext = {
+    params: { id: string };
+};
+
+const resolveParams = async (context: RouteContext | LegacyRouteContext) => {
+    const maybePromise = context.params as Promise<{ id: string }>;
+    return typeof maybePromise?.then === "function" ? await maybePromise : (context.params as { id: string });
+};
+
+export async function GET(_: NextRequest, context: RouteContext | LegacyRouteContext) {
     const dbUser = await resolveAuthenticatedUser();
     if (!dbUser) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const { id } = await params;
+    const { id } = await resolveParams(context);
     const budget = await prisma.budget.findFirst({
         where: { id, userId: dbUser.id },
     });
@@ -36,11 +45,11 @@ export async function GET(_: NextRequest, { params }: RouteContext) {
     return NextResponse.json({ data: mapBudget(budget) });
 }
 
-export async function PATCH(req: NextRequest, { params }: RouteContext) {
+export async function PATCH(req: NextRequest, context: RouteContext | LegacyRouteContext) {
     const dbUser = await resolveAuthenticatedUser();
     if (!dbUser) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const { id } = await params;
+    const { id } = await resolveParams(context);
     const existing = await prisma.budget.findFirst({
         where: { id, userId: dbUser.id },
     });
@@ -88,11 +97,11 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
     }
 }
 
-export async function DELETE(_: NextRequest, { params }: RouteContext) {
+export async function DELETE(_: NextRequest, context: RouteContext | LegacyRouteContext) {
     const dbUser = await resolveAuthenticatedUser();
     if (!dbUser) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const { id } = await params;
+    const { id } = await resolveParams(context);
     const existing = await prisma.budget.findFirst({
         where: { id, userId: dbUser.id },
     });
