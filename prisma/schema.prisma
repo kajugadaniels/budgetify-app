@@ -73,16 +73,35 @@ model Budget {
 }
 
 model Transaction {
-  id        String   @id @default(cuid())
-  budgetId  String
-  name      String
-  amount    Decimal  @db.Decimal(18, 2)
-  date      DateTime @default(now())
+  id        String              @id @default(cuid())
+  userId    String
+  budgetId  String?
+  merchant  String
+  category  String
+  amount    Decimal             @db.Decimal(18, 2)
+  date      DateTime
+  account   String
+  method    TransactionMethod   @default(CARD)
+  status    TransactionStatus   @default(CLEARED)
   note      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime            @default(now())
+  updatedAt DateTime            @updatedAt
 
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   budget Budget @relation(fields: [budgetId], references: [id], onDelete: Cascade)
 
   @@map("transactions")
+}
+
+enum TransactionMethod {
+  CARD
+  CASH
+  TRANSFER
+  MOBILE
+}
+
+enum TransactionStatus {
+  CLEARED
+  PENDING
+  FLAGGED
 }
