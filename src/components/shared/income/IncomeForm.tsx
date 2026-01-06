@@ -11,6 +11,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
 import { IncomeFormValues, defaultIncomeFormValues } from "./types";
 import { cn } from "@/lib/utils";
 
@@ -21,6 +22,7 @@ type IncomeFormProps = {
     onCancel: () => void;
     isSubmitting?: boolean;
     className?: string;
+    loading?: boolean;
 };
 
 const categoryOptions = ["Salary", "Consulting", "Investments", "Bonus", "Other"];
@@ -33,6 +35,7 @@ const IncomeForm = ({
     onCancel,
     isSubmitting = false,
     className,
+    loading = false,
 }: IncomeFormProps) => {
     const [values, setValues] = useState<IncomeFormValues>(
         initialValues ?? defaultIncomeFormValues()
@@ -83,6 +86,27 @@ const IncomeForm = ({
 
         await onSubmit(values);
     };
+
+    if (loading) {
+        return (
+            <form className={cn("flex h-full flex-col", className)}>
+                <div className="flex-1 space-y-5 overflow-y-auto pr-1">
+                    {[...Array(7)].map((_, index) => (
+                        <div key={index} className="space-y-2">
+                            <Skeleton className="h-3 w-24 rounded" />
+                            <Skeleton className="h-11 rounded-xl border border-border/60" />
+                        </div>
+                    ))}
+                    <Skeleton className="h-3 w-32 rounded" />
+                </div>
+                <div className="mt-4 flex flex-wrap items-center gap-3 border-t border-border/60 bg-card/90 px-1 py-4">
+                    <Skeleton className="h-10 w-[140px] rounded-md" />
+                    <Skeleton className="h-10 w-20 rounded-md" />
+                    <Skeleton className="h-3 w-64 rounded" />
+                </div>
+            </form>
+        );
+    }
 
     return (
         <form onSubmit={handleSubmit} className={cn("flex h-full flex-col", className)}>
