@@ -20,6 +20,7 @@ export async function GET(_: Request, props: { params: Params }) {
 
     const txn = await prisma.transaction.findFirst({
         where: { id, userId: dbUser.id },
+        include: { goal: true },
     });
 
     if (!txn) return notFoundResponse();
@@ -49,6 +50,7 @@ export async function PATCH(request: Request, props: { params: Params }) {
             method: data.method ? data.method.toUpperCase() as any : undefined,
             status: data.status ? data.status.toUpperCase() as any : undefined,
         },
+        include: { goal: true },
     });
 
     return NextResponse.json({ data: serializeTransaction(txn) });

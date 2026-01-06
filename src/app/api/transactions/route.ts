@@ -15,6 +15,7 @@ export async function GET() {
     const transactions = await prisma.transaction.findMany({
         where: { userId: dbUser.id },
         orderBy: { date: "desc" },
+        include: { goal: true },
     });
 
     return NextResponse.json({ data: transactions.map(serializeTransaction) });

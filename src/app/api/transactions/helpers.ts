@@ -14,6 +14,7 @@ type ParsedTransaction = {
     status: "Cleared" | "Pending" | "Flagged";
     note?: string | null;
     budgetId?: string | null;
+    goalId?: string | null;
 };
 
 const methodMap = {
@@ -71,6 +72,7 @@ export function serializeTransaction(txn: any): TransactionRecord {
                     : "Card",
         status: txn.status === "PENDING" ? "Pending" : txn.status === "FLAGGED" ? "Flagged" : "Cleared",
         note: txn.note ?? undefined,
+        goalId: txn.goalId ?? undefined,
     };
 }
 
@@ -106,6 +108,10 @@ export function parseTransactionPayload(payload: any) {
         payload.budgetId && typeof payload.budgetId === "string" && payload.budgetId.length
             ? payload.budgetId
             : null;
+    const goalId =
+        payload.goalId && typeof payload.goalId === "string" && payload.goalId.length
+            ? payload.goalId
+            : null;
 
     if (!merchant) errors.push("Merchant is required.");
     if (!category) errors.push("Category is required.");
@@ -130,6 +136,7 @@ export function parseTransactionPayload(payload: any) {
         status,
         note: note || null,
         budgetId,
+        goalId,
     };
 
     return { data: parsed };

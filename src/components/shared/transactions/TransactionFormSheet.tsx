@@ -60,6 +60,7 @@ const TransactionFormSheet = ({
             method: transaction.method,
             status: transaction.status,
             note: transaction.note ?? "",
+            goalId: transaction.goalId ?? "",
         });
     }, [transaction]);
 
@@ -75,6 +76,7 @@ const TransactionFormSheet = ({
                 amount: Number(values.amount),
                 merchant: values.merchant.trim(),
                 note: values.note?.trim() || "",
+                goalId: values.goalId?.trim() || undefined,
             });
         } finally {
             setIsSubmitting(false);
@@ -330,6 +332,19 @@ const TransactionFormSheet = ({
                                             ))}
                                         </SelectContent>
                                     </Select>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+                                        Goal ID (optional)
+                                    </Label>
+                                    <Input
+                                        className="h-11 rounded-xl border-border/60 bg-background/70"
+                                        placeholder="Attach to a goal for tracking"
+                                        value={values.goalId}
+                                        onChange={(event) =>
+                                            setValues((prev) => ({ ...prev, goalId: event.target.value }))
+                                        }
+                                    />
                                 </div>
                                 <div className="space-y-2">
                                     <Label className="text-xs uppercase tracking-[0.2em] text-muted-foreground">

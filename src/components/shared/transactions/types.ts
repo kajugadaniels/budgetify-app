@@ -8,6 +8,7 @@ export type TransactionRecord = {
     method: "Card" | "Cash" | "Transfer" | "Mobile";
     status: "Cleared" | "Pending" | "Flagged";
     note?: string;
+    goalId?: string;
 };
 
 export type TransactionFormValues = {
@@ -19,6 +20,7 @@ export type TransactionFormValues = {
     method: TransactionRecord["method"];
     status: TransactionRecord["status"];
     note?: string;
+    goalId?: string;
 };
 
 export const defaultTransactionFormValues = (): TransactionFormValues => ({
