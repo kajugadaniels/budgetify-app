@@ -38,7 +38,7 @@ const defaultSummary: Summary = { incomes: [], transactions: [], goals: [] };
 const msInDay = 1000 * 60 * 60 * 24;
 
 export default function DashboardPageClient() {
-    const now = new Date();
+    const now = useMemo(() => new Date(), []);
     const [summary, setSummary] = useState<Summary>(defaultSummary);
     const [loading, setLoading] = useState(true);
     const [paydayDay, setPaydayDay] = useState(1);
