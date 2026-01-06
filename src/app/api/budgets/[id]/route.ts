@@ -16,11 +16,11 @@ const mapBudget = (budget: Budget) => ({
     updatedAt: budget.updatedAt,
 });
 
-type Params = {
+type RouteContext = {
     params: Promise<{ id: string }>;
 };
 
-export async function GET(_: NextRequest, { params }: Params) {
+export async function GET(_: NextRequest, { params }: RouteContext) {
     const dbUser = await resolveAuthenticatedUser();
     if (!dbUser) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
@@ -36,7 +36,7 @@ export async function GET(_: NextRequest, { params }: Params) {
     return NextResponse.json({ data: mapBudget(budget) });
 }
 
-export async function PATCH(req: NextRequest, { params }: Params) {
+export async function PATCH(req: NextRequest, { params }: RouteContext) {
     const dbUser = await resolveAuthenticatedUser();
     if (!dbUser) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
@@ -88,7 +88,7 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     }
 }
 
-export async function DELETE(_: NextRequest, { params }: Params) {
+export async function DELETE(_: NextRequest, { params }: RouteContext) {
     const dbUser = await resolveAuthenticatedUser();
     if (!dbUser) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
