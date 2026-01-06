@@ -146,7 +146,6 @@ const GoalFormSheet = ({
                             Target date
                             <CalendarDays className="h-4 w-4 text-primary" aria-hidden />
                         </div>
-        """}"""
                         {loading ? (
                             <>
                                 <Skeleton className="mt-2 h-4 w-32 rounded" />
