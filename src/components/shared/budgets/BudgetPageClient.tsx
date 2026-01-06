@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { LightbulbIcon, Loader2, Plus, Target, Wallet, Wallet2 } from "lucide-react";
+import { LightbulbIcon, Loader2, Plus, Target, Wallet2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -368,7 +368,7 @@ export default function BudgetPageClient() {
                     setTransactionSheetOpen(false);
                     setTransactionBudget(null);
                 }}
-                onCreated={({ budget, transaction }) => {
+                onCreated={({ budget }) => {
                     setBudgets((prev) =>
                         prev.map((item) => (item.id === budget.id ? { ...budget } : item))
                     );
