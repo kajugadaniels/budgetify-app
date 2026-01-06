@@ -16,6 +16,7 @@ import {
     formatCurrency,
     formatDate,
 } from "@/components/shared/income/types";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
     Dialog,
     DialogContent,
@@ -284,9 +285,13 @@ const IncomePage = () => {
                             <p className="text-xs uppercase tracking-[0.22em] text-muted-foreground">
                                 Filtered inflow
                             </p>
-                            <p className="mt-2 text-3xl font-semibold text-foreground">
-                                {formatCurrency(totals.total)}
-                            </p>
+                            {loading ? (
+                                <Skeleton className="mt-2 h-8 w-32 rounded" />
+                            ) : (
+                                <p className="mt-2 text-3xl font-semibold text-foreground">
+                                    {formatCurrency(totals.total)}
+                                </p>
+                            )}
                         </div>
                         <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
                             <PiggyBank className="h-5 w-5" aria-hidden />
@@ -302,9 +307,13 @@ const IncomePage = () => {
                             <p className="text-xs uppercase tracking-[0.22em] text-muted-foreground">
                                 Recurring coverage
                             </p>
-                            <p className="mt-2 text-3xl font-semibold text-foreground">
-                                {formatCurrency(totals.recurring)}
-                            </p>
+                            {loading ? (
+                                <Skeleton className="mt-2 h-8 w-32 rounded" />
+                            ) : (
+                                <p className="mt-2 text-3xl font-semibold text-foreground">
+                                    {formatCurrency(totals.recurring)}
+                                </p>
+                            )}
                         </div>
                         <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
                             <ShieldCheck className="h-5 w-5" aria-hidden />
@@ -320,9 +329,13 @@ const IncomePage = () => {
                             <p className="text-xs uppercase tracking-[0.22em] text-muted-foreground">
                                 Next payout
                             </p>
-                            <p className="mt-2 text-xl font-semibold text-foreground">
-                                {totals.nextDate ? formatDate(totals.nextDate.toISOString()) : "—"}
-                            </p>
+                            {loading ? (
+                                <Skeleton className="mt-2 h-6 w-40 rounded" />
+                            ) : (
+                                <p className="mt-2 text-xl font-semibold text-foreground">
+                                    {totals.nextDate ? formatDate(totals.nextDate.toISOString()) : "—"}
+                                </p>
+                            )}
                         </div>
                         <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
                             <Clock3 className="h-5 w-5" aria-hidden />
@@ -336,12 +349,17 @@ const IncomePage = () => {
 
             <IncomeTable
                 data={filteredEntries}
+                loading={loading}
                 onView={setSelectedIncome}
                 onEdit={handleEditIncome}
                 onDelete={handleDeleteIncome}
             />
 
-            <IncomeDetailsSheet income={selectedIncome} onClose={() => setSelectedIncome(null)} />
+            <IncomeDetailsSheet
+                income={selectedIncome}
+                onClose={() => setSelectedIncome(null)}
+                loading={loading && Boolean(selectedIncome)}
+            />
             <IncomeFormSheet
                 open={formOpen}
                 mode={formMode}
@@ -351,6 +369,7 @@ const IncomePage = () => {
                     setEditableIncome(null);
                 }}
                 onSubmit={handleSubmitIncome}
+                loading={false}
             />
 
             <Dialog
