@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { BudgetFilters } from "./types";
+import type { BudgetFilters } from "./types";
 
 type Props = {
     initial: BudgetFilters;
