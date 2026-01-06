@@ -1,11 +1,5 @@
-import React from 'react'
+import DashboardPageClient from "@/components/shared/dashboard/DashboardPageClient";
 
-const DashboardPage = () => {
-    return (
-        <div>
-            Dashboard
-        </div>
-    )
+export default function DashboardPage() {
+    return <DashboardPageClient />;
 }
-
-export default DashboardPage
