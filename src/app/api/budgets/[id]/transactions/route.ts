@@ -1,9 +1,9 @@
-import { NextResponse } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 import { Prisma, type Budget, type Transaction } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { resolveAuthenticatedUser } from "../../../incomes/helpers";
 
-type Params = { params: { id?: string } } | Promise<{ params: { id?: string } }>;
+type Params = { params: Promise<{ id: string }> };
 
 const mapBudget = (budget: Budget) => ({
     id: budget.id,
@@ -33,8 +33,8 @@ const mapTransaction = (txn: Transaction) => ({
     updatedAt: txn.updatedAt,
 });
 
-export async function GET(_: Request, props: Params) {
-    const { id } = await Promise.resolve(props.params);
+export async function GET(_: NextRequest, { params }: Params) {
+    const { id } = await params;
     if (!id) return NextResponse.json({ error: "Budget id is required." }, { status: 400 });
 
     const dbUser = await resolveAuthenticatedUser();
@@ -58,8 +58,8 @@ export async function GET(_: Request, props: Params) {
     });
 }
 
-export async function POST(req: Request, props: Params) {
-    const { id } = await Promise.resolve(props.params);
+export async function POST(req: NextRequest, { params }: Params) {
+    const { id } = await params;
     if (!id) return NextResponse.json({ error: "Budget id is required." }, { status: 400 });
 
     const dbUser = await resolveAuthenticatedUser();
