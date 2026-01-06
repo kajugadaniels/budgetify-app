@@ -4,11 +4,13 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import {
     AlertTriangle,
     CalendarClock,
+    CreditCard,
     Coins,
     Flag,
     LineChart as LineChartIcon,
     PieChart as PieChartIcon,
     Sparkles,
+    TrendingUp,
 } from "lucide-react";
 import { toast } from "sonner";
 import StatCard from "./StatCard";
@@ -17,6 +19,8 @@ import GoalProgressList from "./GoalProgressList";
 import MonthlyFlowChart from "./MonthlyFlowChart";
 import CategoryBreakdownPie from "./CategoryBreakdownPie";
 import DashboardFilters, { monthLabels } from "./DashboardFilters";
+import CumulativeNetChart from "./CumulativeNetChart";
+import PaymentMethodBar from "./PaymentMethodBar";
 import { formatCurrency } from "@/components/shared/income/types";
 import { formatDate } from "@/components/shared/goals/types";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -191,6 +195,14 @@ export default function DashboardPageClient() {
         });
     }, [daysInSelectedMonth, filteredIncomes, filteredTransactions]);
 
+    const netFlowData = useMemo(() => {
+        let runningNet = 0;
+        return flowData.map((item) => {
+            runningNet += item.income - item.spend;
+            return { day: item.day, net: runningNet };
+        });
+    }, [flowData]);
+
     const categoryData = useMemo(() => {
         const categoryTotals = new Map<string, number>();
         filteredTransactions.forEach((txn) => {
@@ -199,6 +211,16 @@ export default function DashboardPageClient() {
         return Array.from(categoryTotals.entries())
             .map(([name, value]) => ({ name, value }))
             .sort((a, b) => b.value - a.value);
+    }, [filteredTransactions]);
+
+    const methodData = useMemo(() => {
+        const totals = new Map<string, number>();
+        filteredTransactions.forEach((txn) => {
+            totals.set(txn.method, (totals.get(txn.method) ?? 0) + txn.amount);
+        });
+        return ["Card", "Cash", "Transfer", "Mobile"]
+            .map((method) => ({ name: method, value: totals.get(method) ?? 0 }))
+            .filter((item) => item.value > 0);
     }, [filteredTransactions]);
 
     const goalStats = useMemo(() => {
@@ -376,6 +398,42 @@ export default function DashboardPageClient() {
                     </div>
                     <div className="mt-3">
                         <CategoryBreakdownPie data={categoryData} loading={loading} />
+                    </div>
+                </div>
+            </div>
+
+            <div className="grid gap-4 xl:grid-cols-[1.15fr_0.85fr]">
+                <div className="rounded-2xl border border-border/60 bg-card/90 px-5 py-4 shadow-sm">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="text-xs uppercase tracking-[0.22em] text-muted-foreground">
+                                Net glidepath
+                            </p>
+                            <h3 className="text-base font-semibold text-foreground">
+                                Cumulative net change — {selectedMonthLabel} {year}
+                            </h3>
+                        </div>
+                        <TrendingUp className="h-5 w-5 text-primary" aria-hidden />
+                    </div>
+                    <div className="mt-3">
+                        <CumulativeNetChart data={netFlowData} loading={loading} />
+                    </div>
+                </div>
+
+                <div className="rounded-2xl border border-border/60 bg-card/90 px-5 py-4 shadow-sm">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="text-xs uppercase tracking-[0.22em] text-muted-foreground">
+                                Payment methods
+                            </p>
+                            <h3 className="text-base font-semibold text-foreground">
+                                Mix by amount — {selectedMonthLabel}
+                            </h3>
+                        </div>
+                        <CreditCard className="h-5 w-5 text-primary" aria-hidden />
+                    </div>
+                    <div className="mt-3">
+                        <PaymentMethodBar data={methodData} loading={loading} />
                     </div>
                 </div>
             </div>
