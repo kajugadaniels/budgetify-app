@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import type { BudgetFilters } from "./types";
 
@@ -10,18 +10,11 @@ type Props = {
     onReset: () => void;
 };
 
-export default function BudgetFilters({ initial, onApply, onReset }: Props) {
+const BudgetFiltersInner = ({ initial, onApply, onReset }: Props) => {
     const [search, setSearch] = useState(initial.search ?? "");
     const [category, setCategory] = useState(initial.category ?? "");
     const [month, setMonth] = useState<number | undefined>(initial.month);
     const [year, setYear] = useState<number | undefined>(initial.year);
-
-    useEffect(() => {
-        setSearch(initial.search ?? "");
-        setCategory(initial.category ?? "");
-        setMonth(initial.month);
-        setYear(initial.year);
-    }, [initial]);
 
     return (
         <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-border/60 bg-card/80 p-4 shadow-sm">
@@ -94,4 +87,13 @@ export default function BudgetFilters({ initial, onApply, onReset }: Props) {
             </div>
         </div>
     );
+};
+
+export default function BudgetFilters(props: Props) {
+    const filterKey = useMemo(() => {
+        const { initial } = props;
+        return `${initial.search ?? ""}|${initial.category ?? ""}|${initial.month ?? ""}|${initial.year ?? ""}`;
+    }, [props]);
+
+    return <BudgetFiltersInner key={filterKey} {...props} />;
 }
