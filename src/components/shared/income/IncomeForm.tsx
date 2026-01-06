@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -28,7 +28,7 @@ type IncomeFormProps = {
 const categoryOptions = ["Salary", "Consulting", "Investments", "Bonus", "Other"];
 const recurrenceOptions: IncomeFormValues["recurrence"][] = ["Recurring", "One-time"];
 
-const IncomeForm = ({
+const IncomeFormInner = ({
     mode,
     initialValues,
     onSubmit,
@@ -37,14 +37,10 @@ const IncomeForm = ({
     className,
     loading = false,
 }: IncomeFormProps) => {
-    const [values, setValues] = useState<IncomeFormValues>(
+    const [values, setValues] = useState<IncomeFormValues>(() =>
         initialValues ?? defaultIncomeFormValues()
     );
     const [error, setError] = useState<string | null>(null);
-
-    useEffect(() => {
-        setValues(initialValues ?? defaultIncomeFormValues());
-    }, [initialValues]);
 
     const isCreate = useMemo(() => mode === "create", [mode]);
 
@@ -316,6 +312,15 @@ const IncomeForm = ({
             </div>
         </form>
     );
+};
+
+const IncomeForm = (props: IncomeFormProps) => {
+    const formKey = useMemo(
+        () => (props.initialValues ? JSON.stringify(props.initialValues) : `create-${props.mode}`),
+        [props.initialValues, props.mode]
+    );
+
+    return <IncomeFormInner key={formKey} {...props} />;
 };
 
 export default IncomeForm;
