@@ -17,17 +17,25 @@ type Props = {
 };
 
 type FormState = {
-    name: string;
+    merchant: string;
     amount: number;
     date: string;
     note: string;
+    account: string;
+    category: string;
+    method: "Card" | "Cash" | "Transfer" | "Mobile";
+    status: "Cleared" | "Pending" | "Flagged";
 };
 
 const defaultFormState = (): FormState => ({
-    name: "",
+    merchant: "",
     amount: 0,
     date: "",
     note: "",
+    account: "Budget account",
+    category: "General",
+    method: "Card",
+    status: "Cleared",
 });
 
 export default function BudgetTransactionSheet({ budget, open, onClose, onCreated }: Props) {
@@ -67,8 +75,8 @@ export default function BudgetTransactionSheet({ budget, open, onClose, onCreate
         event.preventDefault();
         if (!budget || saving) return;
 
-        if (!form.name.trim() || !form.amount || form.amount <= 0) {
-            toast.error("Name and amount greater than zero are required.");
+        if (!form.merchant.trim() || !form.amount || form.amount <= 0) {
+            toast.error("Merchant and amount greater than zero are required.");
             return;
         }
 
@@ -77,12 +85,16 @@ export default function BudgetTransactionSheet({ budget, open, onClose, onCreate
             const response = await fetch(`/api/budgets/${budget.id}/transactions`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    name: form.name.trim(),
-                    amount: Number(form.amount),
-                    date: form.date,
-                    note: form.note.trim(),
-                }),
+                    body: JSON.stringify({
+                        merchant: form.merchant.trim(),
+                        category: form.category || budget.category,
+                        account: form.account,
+                        method: form.method,
+                        status: form.status,
+                        amount: Number(form.amount),
+                        date: form.date,
+                        note: form.note.trim(),
+                    }),
             });
             const body = await response.json().catch(() => null);
             if (!response.ok) throw new Error(body?.error ?? "Unable to add transaction.");
@@ -118,12 +130,12 @@ export default function BudgetTransactionSheet({ budget, open, onClose, onCreate
                     </DialogDescription>
                 </DialogHeader>
 
-                <div className="rounded-2xl border border-border/60 bg-muted/20 p-4">
-                    <div className="flex items-center justify-between gap-4">
-                        <div>
-                            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Planned</p>
-                            <p className="text-xl font-semibold text-foreground">
-                                {formatCurrency(totals.planned)}
+        <div className="rounded-2xl border border-border/60 bg-muted/20 p-4">
+            <div className="flex items-center justify-between gap-4">
+                <div>
+                    <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Planned</p>
+                    <p className="text-xl font-semibold text-foreground">
+                        {formatCurrency(totals.planned)}
                             </p>
                             <p className="text-xs text-muted-foreground">
                                 {monthLabels[(budget.month || 1) - 1]} {budget.year}
@@ -148,10 +160,10 @@ export default function BudgetTransactionSheet({ budget, open, onClose, onCreate
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="grid gap-4 md:grid-cols-2">
                         <div className="space-y-2">
-                            <Label className="text-sm font-semibold text-foreground">Name</Label>
+                            <Label className="text-sm font-semibold text-foreground">Merchant</Label>
                             <Input
-                                value={form.name}
-                                onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))}
+                                value={form.merchant}
+                                onChange={(e) => setForm((prev) => ({ ...prev, merchant: e.target.value }))}
                                 placeholder="e.g., Utilities payment"
                                 required
                             />
@@ -191,6 +203,55 @@ export default function BudgetTransactionSheet({ budget, open, onClose, onCreate
                                 onChange={(e) => setForm((prev) => ({ ...prev, note: e.target.value }))}
                                 placeholder="Add context"
                             />
+                        </div>
+                    </div>
+                    <div className="grid gap-4 md:grid-cols-2">
+                        <div className="space-y-2">
+                            <Label className="text-sm font-semibold text-foreground">Account</Label>
+                            <Input
+                                value={form.account}
+                                onChange={(e) => setForm((prev) => ({ ...prev, account: e.target.value }))}
+                                placeholder="e.g., Checking • 2841"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label className="text-sm font-semibold text-foreground">Category</Label>
+                            <Input
+                                value={form.category}
+                                onChange={(e) => setForm((prev) => ({ ...prev, category: e.target.value }))}
+                                placeholder="Defaults to budget category"
+                            />
+                        </div>
+                    </div>
+                    <div className="grid gap-4 md:grid-cols-2">
+                        <div className="space-y-2">
+                            <Label className="text-sm font-semibold text-foreground">Method</Label>
+                            <select
+                                className="h-11 w-full rounded-lg border border-input bg-background px-3 text-sm text-foreground"
+                                value={form.method}
+                                onChange={(e) =>
+                                    setForm((prev) => ({ ...prev, method: e.target.value as FormState["method"] }))
+                                }
+                            >
+                                <option>Card</option>
+                                <option>Cash</option>
+                                <option>Transfer</option>
+                                <option>Mobile</option>
+                            </select>
+                        </div>
+                        <div className="space-y-2">
+                            <Label className="text-sm font-semibold text-foreground">Status</Label>
+                            <select
+                                className="h-11 w-full rounded-lg border border-input bg-background px-3 text-sm text-foreground"
+                                value={form.status}
+                                onChange={(e) =>
+                                    setForm((prev) => ({ ...prev, status: e.target.value as FormState["status"] }))
+                                }
+                            >
+                                <option>Cleared</option>
+                                <option>Pending</option>
+                                <option>Flagged</option>
+                            </select>
                         </div>
                     </div>
                 </form>
