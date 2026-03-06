@@ -1,6 +1,20 @@
+import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 import '../../../../core/config/app_env.dart';
+
+class GoogleIdentityException implements Exception {
+  const GoogleIdentityException({
+    required this.message,
+    this.isCanceled = false,
+  });
+
+  final String message;
+  final bool isCanceled;
+
+  @override
+  String toString() => message;
+}
 
 class GoogleIdentityService {
   GoogleIdentityService({GoogleSignIn? googleSignIn})
@@ -12,16 +26,44 @@ class GoogleIdentityService {
   Future<String> getIdToken() async {
     await _ensureInitialized();
 
-    final account = await _googleSignIn.authenticate();
-    final idToken = account.authentication.idToken;
+    try {
+      final account = await _googleSignIn.authenticate();
+      final idToken = account.authentication.idToken;
 
-    if (idToken == null || idToken.isEmpty) {
-      throw StateError(
-        'Google sign-in did not return an ID token. Check GOOGLE_SERVER_CLIENT_ID configuration.',
-      );
+      if (idToken == null || idToken.isEmpty) {
+        throw const GoogleIdentityException(
+          message:
+              'Google sign-in did not return an ID token. Check your server client configuration.',
+        );
+      }
+
+      return idToken;
+    } on GoogleSignInException catch (error) {
+      switch (error.code) {
+        case GoogleSignInExceptionCode.canceled:
+          throw const GoogleIdentityException(
+            message: 'Google sign-in was canceled.',
+            isCanceled: true,
+          );
+        case GoogleSignInExceptionCode.interrupted:
+          throw const GoogleIdentityException(
+            message: 'Google sign-in was interrupted. Please try again.',
+          );
+        case GoogleSignInExceptionCode.uiUnavailable:
+          throw const GoogleIdentityException(
+            message: 'Google sign-in is unavailable on this device right now.',
+          );
+        case GoogleSignInExceptionCode.clientConfigurationError:
+          throw const GoogleIdentityException(
+            message:
+                'Google sign-in client configuration is incomplete for this platform.',
+          );
+        default:
+          throw GoogleIdentityException(
+            message: error.description ?? 'Unable to continue with Google.',
+          );
+      }
     }
-
-    return idToken;
   }
 
   Future<void> signOut() async {
@@ -36,7 +78,9 @@ class GoogleIdentityService {
 
     await _googleSignIn.initialize(
       serverClientId: AppEnv.googleServerClientId,
-      clientId: AppEnv.optional('GOOGLE_CLIENT_ID'),
+      clientId: kIsWeb
+          ? AppEnv.optional('GOOGLE_CLIENT_ID') ?? AppEnv.googleServerClientId
+          : null,
     );
     _isInitialized = true;
   }
