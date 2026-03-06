@@ -11,12 +11,14 @@ class AuthLoadingButton extends StatefulWidget {
     required this.loadingLabel,
     required this.isLoading,
     required this.onPressed,
+    this.fontSize = 15,
   });
 
   final String label;
   final String loadingLabel;
   final bool isLoading;
   final VoidCallback? onPressed;
+  final double fontSize;
 
   @override
   State<AuthLoadingButton> createState() => _AuthLoadingButtonState();
@@ -64,10 +66,17 @@ class _AuthLoadingButtonState extends State<AuthLoadingButton>
                   children: [
                     _OrbitLoader(controller: _controller),
                     const SizedBox(width: 14),
-                    Text(widget.loadingLabel),
+                    Text(
+                      widget.loadingLabel,
+                      style: TextStyle(fontSize: widget.fontSize),
+                    ),
                   ],
                 )
-              : Text(widget.label, key: const ValueKey('idle')),
+              : Text(
+                  widget.label,
+                  key: const ValueKey('idle'),
+                  style: TextStyle(fontSize: widget.fontSize),
+                ),
         ),
       ),
     );
