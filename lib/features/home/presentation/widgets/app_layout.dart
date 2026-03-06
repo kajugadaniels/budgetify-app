@@ -43,15 +43,11 @@ class AppLayout extends StatelessWidget {
                   isCompact ? 16 : 24,
                   18,
                   isCompact ? 16 : 24,
-                  isCompact ? 16 : 22,
+                  isCompact ? 24 : 34,
                 ),
                 child: Column(
                   children: [
-                    AppNavbar(
-                      user: user,
-                      isLoggingOut: isLoggingOut,
-                      onLogout: onLogout,
-                    ),
+                    AppNavbar(user: user),
                     SizedBox(height: isCompact ? 18 : 24),
                     Expanded(
                       child: Align(
@@ -64,7 +60,7 @@ class AppLayout extends StatelessWidget {
                         ),
                       ),
                     ),
-                    SizedBox(height: isCompact ? 14 : 18),
+                    SizedBox(height: isCompact ? 22 : 28),
                     AppBottomNavBar(
                       currentSection: currentSection,
                       destinations: defaultAppNavDestinations,
