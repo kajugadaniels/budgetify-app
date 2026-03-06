@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/app_toast.dart';
 
 class AuthFooterLinks extends StatelessWidget {
   const AuthFooterLinks({super.key});
@@ -32,12 +33,11 @@ class AuthFooterLinks extends StatelessWidget {
   }
 
   void _showPlaceholder(BuildContext context, String label) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
+    AppToast.info(
+      context,
+      title: label,
+      description:
           '$label content can be connected once those pages are ready.',
-        ),
-      ),
     );
   }
 }
