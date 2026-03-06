@@ -1,35 +1,21 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/glass_panel.dart';
+import '../../../../core/widgets/skeleton_loader.dart';
 import 'auth_footer_links.dart';
 
 class AuthLayout extends StatelessWidget {
-  const AuthLayout({
-    super.key,
-    required this.title,
-    required this.description,
-    required this.child,
-  });
+  const AuthLayout({super.key, required this.child, this.preview});
 
-  final String title;
-  final String description;
   final Widget child;
+  final Widget? preview;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: DecoratedBox(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              AppColors.background,
-              Color(0xFF0E1116),
-              Color(0xFF11151B),
-            ],
-          ),
-        ),
+        decoration: const _AuthBackgroundDecoration(),
         child: SafeArea(
           child: Center(
             child: ConstrainedBox(
@@ -48,12 +34,7 @@ class AuthLayout extends StatelessWidget {
                           if (isWide) {
                             return Row(
                               children: [
-                                Expanded(
-                                  child: _BrandPanel(
-                                    title: title,
-                                    description: description,
-                                  ),
-                                ),
+                                Expanded(child: _BrandPanel(preview: preview)),
                                 const SizedBox(width: 28),
                                 Expanded(
                                   child: Align(
@@ -68,11 +49,7 @@ class AuthLayout extends StatelessWidget {
                           return SingleChildScrollView(
                             child: Column(
                               children: [
-                                _BrandPanel(
-                                  title: title,
-                                  description: description,
-                                  compact: true,
-                                ),
+                                _BrandPanel(compact: true, preview: preview),
                                 const SizedBox(height: 24),
                                 _FormPanel(child: child),
                               ],
@@ -101,17 +78,9 @@ class _AuthHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Container(
-          width: 48,
-          height: 48,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            color: AppColors.primary.withValues(alpha: 0.14),
-            border: Border.all(
-              color: AppColors.primary.withValues(alpha: 0.25),
-            ),
-          ),
-          child: const Icon(
+        const GlassBadge(
+          padding: EdgeInsets.all(10),
+          child: Icon(
             Icons.account_balance_wallet_rounded,
             color: AppColors.primary,
           ),
@@ -130,143 +99,43 @@ class _AuthHeader extends StatelessWidget {
 }
 
 class _BrandPanel extends StatelessWidget {
-  const _BrandPanel({
-    required this.title,
-    required this.description,
-    this.compact = false,
-  });
+  const _BrandPanel({this.compact = false, this.preview});
 
-  final String title;
-  final String description;
   final bool compact;
+  final Widget? preview;
 
   @override
   Widget build(BuildContext context) {
-    final titleStyle = Theme.of(context).textTheme.headlineLarge?.copyWith(
-      fontSize: compact ? 34 : 52,
-      height: 1.05,
-    );
+    final previewSection = compact
+        ? AspectRatio(
+            aspectRatio: 1.18,
+            child: preview ?? const _PreviewSurface(),
+          )
+        : Expanded(child: preview ?? const _PreviewSurface());
 
-    return Container(
-      padding: EdgeInsets.all(compact ? 24 : 32),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(32),
-        border: Border.all(color: AppColors.border),
-        color: AppColors.surface.withValues(alpha: 0.5),
-      ),
+    return GlassPanel(
+      padding: EdgeInsets.all(compact ? 22 : 30),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(999),
-              color: AppColors.primary.withValues(alpha: 0.12),
+          Text(
+            'Financial command center',
+            style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+              fontSize: compact ? 30 : 48,
+              height: 1.05,
             ),
-            child: const Text(
-              'Secure sign in for your financial workspace',
-              style: TextStyle(
-                color: AppColors.primary,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'A refined sign-in experience with a focused, glass-based interface for secure access.',
+            style: Theme.of(
+              context,
+            ).textTheme.bodyLarge?.copyWith(fontSize: compact ? 15 : 17),
           ),
           const SizedBox(height: 24),
-          Text(title, style: titleStyle),
-          const SizedBox(height: 18),
-          ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 520),
-            child: Text(
-              description,
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: AppColors.textSecondary,
-                fontSize: 17,
-              ),
-            ),
-          ),
-          const SizedBox(height: 28),
-          const _Highlights(),
+          previewSection,
         ],
-      ),
-    );
-  }
-}
-
-class _Highlights extends StatelessWidget {
-  const _Highlights();
-
-  @override
-  Widget build(BuildContext context) {
-    return Wrap(
-      spacing: 16,
-      runSpacing: 16,
-      children: const [
-        _HighlightTile(
-          icon: Icons.insights_rounded,
-          title: 'Sharper planning',
-          description: 'Track budgets, trends, and cash flow in one place.',
-        ),
-        _HighlightTile(
-          icon: Icons.lock_clock_rounded,
-          title: 'Protected access',
-          description: 'A focused, secure entry point for your finance team.',
-        ),
-        _HighlightTile(
-          icon: Icons.auto_graph_rounded,
-          title: 'Confident decisions',
-          description: 'Start each session with the numbers that matter.',
-        ),
-      ],
-    );
-  }
-}
-
-class _HighlightTile extends StatelessWidget {
-  const _HighlightTile({
-    required this.icon,
-    required this.title,
-    required this.description,
-  });
-
-  final IconData icon;
-  final String title;
-  final String description;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: 220,
-      child: Container(
-        padding: const EdgeInsets.all(18),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(24),
-          color: AppColors.backgroundSecondary.withValues(alpha: 0.8),
-          border: Border.all(color: AppColors.border),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              width: 42,
-              height: 42,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(14),
-                color: AppColors.primary.withValues(alpha: 0.12),
-              ),
-              child: Icon(icon, color: AppColors.primary),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              title,
-              style: Theme.of(
-                context,
-              ).textTheme.titleMedium?.copyWith(color: AppColors.textPrimary),
-            ),
-            const SizedBox(height: 8),
-            Text(description, style: Theme.of(context).textTheme.bodyMedium),
-          ],
-        ),
       ),
     );
   }
@@ -281,21 +150,142 @@ class _FormPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     return ConstrainedBox(
       constraints: const BoxConstraints(maxWidth: 520),
-      child: Container(
-        padding: const EdgeInsets.all(28),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(32),
-          color: AppColors.surfaceElevated.withValues(alpha: 0.94),
-          border: Border.all(color: AppColors.border),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.24),
-              blurRadius: 36,
-              offset: const Offset(0, 20),
+      child: GlassPanel(padding: const EdgeInsets.all(28), child: child),
+    );
+  }
+}
+
+class _AuthBackgroundDecoration extends Decoration {
+  const _AuthBackgroundDecoration();
+
+  @override
+  BoxPainter createBoxPainter([VoidCallback? onChanged]) {
+    return _AuthBackgroundPainter();
+  }
+}
+
+class _AuthBackgroundPainter extends BoxPainter {
+  @override
+  void paint(Canvas canvas, Offset offset, ImageConfiguration configuration) {
+    final size = configuration.size;
+    if (size == null) {
+      return;
+    }
+
+    final rect = offset & size;
+    final paint = Paint()
+      ..shader = const LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [AppColors.background, Color(0xFF0D1116), Color(0xFF131922)],
+      ).createShader(rect);
+    canvas.drawRect(rect, paint);
+
+    final accentPaint = Paint()
+      ..color = AppColors.primary.withValues(alpha: 0.08);
+    canvas.drawCircle(
+      Offset(offset.dx + size.width * 0.2, offset.dy + size.height * 0.18),
+      size.shortestSide * 0.2,
+      accentPaint,
+    );
+    canvas.drawCircle(
+      Offset(offset.dx + size.width * 0.82, offset.dy + size.height * 0.78),
+      size.shortestSide * 0.28,
+      Paint()..color = Colors.white.withValues(alpha: 0.04),
+    );
+  }
+}
+
+class _PreviewSurface extends StatelessWidget {
+  const _PreviewSurface();
+
+  @override
+  Widget build(BuildContext context) {
+    return SkeletonLoader(
+      child: Column(
+        children: [
+          Expanded(
+            child: Row(
+              children: [
+                Expanded(
+                  flex: 7,
+                  child: GlassPanel(
+                    borderRadius: BorderRadius.circular(28),
+                    padding: const EdgeInsets.all(22),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: const [
+                        SkeletonBox(width: 140, height: 18),
+                        SizedBox(height: 18),
+                        SkeletonBox(height: 140, radius: 24),
+                        SizedBox(height: 18),
+                        SkeletonBox(width: 180, height: 18),
+                        SizedBox(height: 12),
+                        SkeletonBox(height: 14),
+                        SizedBox(height: 10),
+                        SkeletonBox(width: 220, height: 14),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  flex: 5,
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: GlassPanel(
+                          borderRadius: BorderRadius.circular(28),
+                          padding: const EdgeInsets.all(20),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: const [
+                              SkeletonBox(width: 90, height: 16),
+                              SizedBox(height: 16),
+                              SkeletonBox(height: 74, radius: 20),
+                              SizedBox(height: 12),
+                              SkeletonBox(width: 110, height: 14),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Expanded(
+                        child: GlassPanel(
+                          borderRadius: BorderRadius.circular(28),
+                          padding: const EdgeInsets.all(20),
+                          child: Column(
+                            children: const [
+                              SkeletonBox(height: 14, width: 110),
+                              SizedBox(height: 16),
+                              SkeletonBox(height: 14),
+                              SizedBox(height: 10),
+                              SkeletonBox(height: 14),
+                              SizedBox(height: 10),
+                              SkeletonBox(height: 14, width: 140),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-        child: child,
+          ),
+          const SizedBox(height: 16),
+          const GlassPanel(
+            borderRadius: BorderRadius.all(Radius.circular(24)),
+            padding: EdgeInsets.all(18),
+            child: Row(
+              children: [
+                SkeletonBox(width: 42, height: 42, radius: 14),
+                SizedBox(width: 14),
+                Expanded(child: SkeletonBox(height: 14)),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
