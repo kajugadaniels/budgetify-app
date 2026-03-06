@@ -6,11 +6,15 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/app_toast.dart';
 import '../../../../core/widgets/glass_panel.dart';
 import '../../../../core/widgets/skeleton_loader.dart';
+import '../../application/auth_service_contract.dart';
+import '../../data/models/auth_user.dart';
 import '../widgets/auth_layout.dart';
 import '../widgets/auth_loading_button.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+  const LoginPage({super.key, required this.authService});
+
+  final AuthServiceContract authService;
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -19,6 +23,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   bool _isPageLoading = true;
   bool _isSubmitting = false;
+  AuthUser? _currentUser;
 
   @override
   void initState() {
@@ -27,13 +32,27 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> _loadPage() async {
-    await Future<void>.delayed(const Duration(milliseconds: 900));
+    AuthUser? restoredUser;
+
+    try {
+      await Future<void>.delayed(const Duration(milliseconds: 900));
+      restoredUser = await widget.authService.restoreAuthenticatedUser();
+    } catch (error) {
+      if (mounted) {
+        AppToast.info(
+          context,
+          title: 'Session unavailable',
+          description: _readableError(error),
+        );
+      }
+    }
 
     if (!mounted) {
       return;
     }
 
     setState(() {
+      _currentUser = restoredUser;
       _isPageLoading = false;
     });
   }
@@ -47,7 +66,11 @@ class _LoginPageState extends State<LoginPage> {
         switchOutCurve: Curves.easeInCubic,
         child: _isPageLoading
             ? const _LoginPageSkeleton()
-            : _LoginForm(isSubmitting: _isSubmitting, onSubmit: _submit),
+            : _LoginForm(
+                isSubmitting: _isSubmitting,
+                currentUser: _currentUser,
+                onSubmit: _submit,
+              ),
       ),
     );
   }
@@ -57,33 +80,65 @@ class _LoginPageState extends State<LoginPage> {
       _isSubmitting = true;
     });
 
-    await Future<void>.delayed(const Duration(milliseconds: 1800));
+    try {
+      final session = await widget.authService.signInWithGoogle();
 
-    if (!mounted) {
-      return;
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        _currentUser = session.user;
+      });
+
+      AppToast.success(
+        context,
+        title: 'Signed in successfully',
+        description:
+            'Connected as ${session.user.fullName ?? session.user.email}.',
+      );
+    } catch (error) {
+      if (mounted) {
+        AppToast.error(
+          context,
+          title: 'Sign-in failed',
+          description: _readableError(error),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSubmitting = false;
+        });
+      }
     }
-
-    setState(() {
-      _isSubmitting = false;
-    });
-
-    _showFeedback('Login action is ready for your authentication integration.');
   }
 
-  void _showFeedback(String message) {
-    AppToast.success(
-      context,
-      title: 'Sign-in flow ready',
-      description: message,
-    );
+  String _readableError(Object error) {
+    final message = error.toString().trim();
+
+    if (message.startsWith('Exception: ')) {
+      return message.replaceFirst('Exception: ', '');
+    }
+
+    if (message.startsWith('StateError: ')) {
+      return message.replaceFirst('StateError: ', '');
+    }
+
+    return message;
   }
 }
 
 class _LoginForm extends StatelessWidget {
-  const _LoginForm({required this.isSubmitting, required this.onSubmit});
+  const _LoginForm({
+    required this.isSubmitting,
+    required this.onSubmit,
+    required this.currentUser,
+  });
 
   final bool isSubmitting;
   final Future<void> Function() onSubmit;
+  final AuthUser? currentUser;
 
   @override
   Widget build(BuildContext context) {
@@ -92,6 +147,7 @@ class _LoginForm extends StatelessWidget {
         final isCompact = constraints.maxWidth < 420;
         final panelPadding = isCompact ? 22.0 : 28.0;
         final titleSize = isCompact ? 22.0 : 24.0;
+        final userLabel = currentUser?.fullName ?? currentUser?.email;
 
         return GlassPanel(
           key: const ValueKey('login-form'),
@@ -112,15 +168,80 @@ class _LoginForm extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                'Budgetify helps you organize spending, monitor budgets, and keep your finances clear in one place.',
+                currentUser == null
+                    ? 'Budgetify helps you organize spending, monitor budgets, and keep your finances clear in one place.'
+                    : 'Your Google account is connected to the Budgetify API and ready for authenticated requests.',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   fontSize: 12,
                   color: AppColors.textSecondary,
                 ),
               ),
+              if (currentUser != null) ...[
+                const SizedBox(height: 16),
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    color: Colors.white.withValues(alpha: 0.08),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.1),
+                    ),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 12,
+                    ),
+                    child: Row(
+                      children: [
+                        CircleAvatar(
+                          radius: 16,
+                          backgroundColor: Colors.white.withValues(alpha: 0.12),
+                          backgroundImage: currentUser!.avatarUrl == null
+                              ? null
+                              : NetworkImage(currentUser!.avatarUrl!),
+                          child: currentUser!.avatarUrl == null
+                              ? Text(
+                                  (userLabel ?? 'B').characters.first
+                                      .toUpperCase(),
+                                  style: Theme.of(context).textTheme.labelLarge,
+                                )
+                              : null,
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                userLabel ?? 'Connected account',
+                                style: Theme.of(context).textTheme.labelLarge
+                                    ?.copyWith(
+                                      fontSize: 12,
+                                      color: AppColors.textPrimary,
+                                    ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                currentUser!.email,
+                                style: Theme.of(context).textTheme.bodySmall
+                                    ?.copyWith(
+                                      fontSize: 11,
+                                      color: AppColors.textSecondary,
+                                    ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
               const SizedBox(height: 20),
               AuthLoadingButton(
-                label: 'Continue with Google',
+                label: currentUser == null
+                    ? 'Continue with Google'
+                    : 'Reconnect with Google',
                 loadingLabel: 'Connecting to Google',
                 isLoading: isSubmitting,
                 fontSize: 12,
