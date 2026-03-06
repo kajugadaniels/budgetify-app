@@ -54,7 +54,7 @@ class _AuthHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
     final isCompact = width < 600;
-    final logoSize = isCompact ? 24.0 : 25.0;
+    final logoSize = isCompact ? 30.0 : 30.0;
     final logoPadding = isCompact ? 6.0 : 7.0;
     final titleSize = isCompact ? 24.0 : 26.0;
 
