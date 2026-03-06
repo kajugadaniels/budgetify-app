@@ -40,10 +40,19 @@ abstract final class AppEnv {
   }
 
   static String _normalizeBaseUrl(String value) {
-    if (value.endsWith('/')) {
-      return value.substring(0, value.length - 1);
+    var normalized = value;
+
+    if (normalized.endsWith('/')) {
+      normalized = normalized.substring(0, normalized.length - 1);
     }
 
-    return value;
+    if (normalized.endsWith('/api/v1')) {
+      normalized = normalized.substring(
+        0,
+        normalized.length - '/api/v1'.length,
+      );
+    }
+
+    return normalized;
   }
 }
