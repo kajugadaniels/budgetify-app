@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/glass_panel.dart';
 import '../../../../core/widgets/skeleton_loader.dart';
 import '../widgets/auth_layout.dart';
@@ -87,8 +88,25 @@ class _LoginForm extends StatelessWidget {
       key: const ValueKey('login-form'),
       padding: const EdgeInsets.all(28),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
+          Text(
+            'Welcome to Budgetify',
+            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+              fontSize: 14,
+              color: AppColors.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Budgetify helps you organize spending, monitor budgets, and keep your finances clear in one place.',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              fontSize: 12,
+              color: AppColors.textSecondary,
+            ),
+          ),
+          const SizedBox(height: 20),
           AuthLoadingButton(
             label: 'Continue with google',
             loadingLabel: 'Connecting to google',
@@ -118,7 +136,15 @@ class _LoginPageSkeleton extends StatelessWidget {
       child: Column(
         key: const ValueKey('login-skeleton'),
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [SkeletonBox(height: 64, radius: 22)],
+        children: const [
+          SkeletonBox(width: 160, height: 18, radius: 12),
+          SizedBox(height: 8),
+          SkeletonBox(height: 14, radius: 10),
+          SizedBox(height: 8),
+          SkeletonBox(width: 220, height: 14, radius: 10),
+          SizedBox(height: 20),
+          SkeletonBox(height: 64, radius: 22),
+        ],
       ),
     );
   }
