@@ -31,6 +31,7 @@ abstract final class AppTheme {
       cardColor: AppColors.surface,
       dividerColor: AppColors.border,
       splashFactory: InkRipple.splashFactory,
+      canvasColor: Colors.transparent,
       textTheme: baseTextTheme.copyWith(
         headlineLarge: baseTextTheme.headlineLarge?.copyWith(
           fontWeight: FontWeight.w700,
@@ -61,7 +62,7 @@ abstract final class AppTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: AppColors.backgroundSecondary,
+        fillColor: Colors.white.withValues(alpha: 0.06),
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 18,
           vertical: 18,
@@ -72,7 +73,7 @@ abstract final class AppTheme {
         suffixIconColor: AppColors.textSecondary,
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(18),
-          borderSide: const BorderSide(color: AppColors.border),
+          borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.09)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(18),
@@ -145,6 +146,9 @@ abstract final class AppTheme {
           color: AppColors.textPrimary,
         ),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      ),
+      progressIndicatorTheme: const ProgressIndicatorThemeData(
+        color: AppColors.primary,
       ),
     );
   }
