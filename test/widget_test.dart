@@ -65,6 +65,7 @@ void main() {
 
     expect(find.text('Hi, Jane Doe.'), findsOneWidget);
     expect(find.text('Session active'), findsOneWidget);
-    expect(find.text('Logout'), findsOneWidget);
+    expect(find.text('Dashboard'), findsOneWidget);
+    expect(find.text('Income'), findsOneWidget);
   });
 }
