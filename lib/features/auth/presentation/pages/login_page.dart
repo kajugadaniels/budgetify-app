@@ -1,11 +1,11 @@
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/app_toast.dart';
 import '../../../../core/widgets/glass_panel.dart';
-import '../../../../core/widgets/skeleton_loader.dart';
 import '../../application/auth_service_contract.dart';
 import '../../data/models/auth_user.dart';
 import '../../data/services/google_identity_service.dart';
@@ -62,15 +62,12 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    if (_isPageLoading) {
+      return const _InitializingScreen();
+    }
+
     return AuthLayout(
-      child: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 280),
-        switchInCurve: Curves.easeOutCubic,
-        switchOutCurve: Curves.easeInCubic,
-        child: _isPageLoading
-            ? const _LoginPageSkeleton()
-            : _LoginForm(isSubmitting: _isSubmitting, onSubmit: _submit),
-      ),
+      child: _LoginForm(isSubmitting: _isSubmitting, onSubmit: _submit),
     );
   }
 
@@ -167,6 +164,38 @@ class _LoginPageState extends State<LoginPage> {
   }
 }
 
+class _InitializingScreen extends StatelessWidget {
+  const _InitializingScreen();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: DecoratedBox(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [AppColors.background, Color(0xFF0D1116), Color(0xFF131922)],
+          ),
+        ),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 0, sigmaY: 0),
+          child: const Center(
+            child: SizedBox(
+              width: 22,
+              height: 22,
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+                strokeWidth: 1.6,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _LoginForm extends StatelessWidget {
   const _LoginForm({required this.isSubmitting, required this.onSubmit});
 
@@ -226,29 +255,6 @@ class _LoginForm extends StatelessWidget {
           ),
         );
       },
-    );
-  }
-}
-
-class _LoginPageSkeleton extends StatelessWidget {
-  const _LoginPageSkeleton();
-
-  @override
-  Widget build(BuildContext context) {
-    return SkeletonLoader(
-      child: Column(
-        key: const ValueKey('login-skeleton'),
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [
-          SkeletonBox(width: 160, height: 18, radius: 12),
-          SizedBox(height: 8),
-          SkeletonBox(height: 14, radius: 10),
-          SizedBox(height: 8),
-          SkeletonBox(width: 220, height: 14, radius: 10),
-          SizedBox(height: 20),
-          SkeletonBox(height: 56, radius: 28),
-        ],
-      ),
     );
   }
 }
