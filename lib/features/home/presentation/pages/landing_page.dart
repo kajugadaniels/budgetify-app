@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 
 import '../../../../core/theme/app_colors.dart';
-import '../../../../core/widgets/app_toast.dart';
 import '../../../../core/widgets/glass_panel.dart';
 import '../../../auth/application/auth_service_contract.dart';
 import '../../../auth/data/models/auth_user.dart';
@@ -93,29 +92,6 @@ class _LandingPageState extends State<LandingPage> {
     setState(() {
       _currentSection = section;
     });
-
-    if (section != AppLayoutSection.dashboard) {
-      AppToast.info(
-        context,
-        title: '${_labelFor(section)} selected',
-        description: 'This section is ready for the next product iteration.',
-      );
-    }
-  }
-
-  String _labelFor(AppLayoutSection section) {
-    switch (section) {
-      case AppLayoutSection.dashboard:
-        return 'Dashboard';
-      case AppLayoutSection.income:
-        return 'Income';
-      case AppLayoutSection.saving:
-        return 'Saving';
-      case AppLayoutSection.expense:
-        return 'Expense';
-      case AppLayoutSection.profile:
-        return 'Profile';
-    }
   }
 
   Future<void> _logout() async {
