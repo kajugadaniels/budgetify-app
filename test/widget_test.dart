@@ -5,6 +5,7 @@ import 'package:budgetify/app/app.dart';
 void main() {
   testWidgets('renders the auth login experience', (WidgetTester tester) async {
     await tester.pumpWidget(const BudgetifyApp());
+    await tester.pump(const Duration(milliseconds: 1000));
 
     expect(find.text('Budgetify'), findsOneWidget);
     expect(find.text('Welcome back'), findsOneWidget);
