@@ -52,10 +52,13 @@ class _AuthLoadingButtonState extends State<AuthLoadingButton>
       child: ElevatedButton(
         onPressed: widget.isLoading ? null : widget.onPressed,
         style: ElevatedButton.styleFrom(
-          minimumSize: const Size.fromHeight(64),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(22),
-          ),
+          minimumSize: const Size.fromHeight(56),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+          backgroundColor: AppColors.primary.withValues(alpha: 0.94),
+          foregroundColor: AppColors.background,
+          shadowColor: Colors.black.withValues(alpha: 0.22),
+          side: BorderSide(color: Colors.white.withValues(alpha: 0.14)),
+          shape: const StadiumBorder(),
         ),
         child: AnimatedSwitcher(
           duration: const Duration(milliseconds: 220),
