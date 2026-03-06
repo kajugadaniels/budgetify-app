@@ -43,7 +43,7 @@ class AppLayout extends StatelessWidget {
                   isCompact ? 16 : 24,
                   18,
                   isCompact ? 16 : 24,
-                  isCompact ? 24 : 34,
+                  isCompact ? 12 : 17,
                 ),
                 child: Column(
                   children: [
