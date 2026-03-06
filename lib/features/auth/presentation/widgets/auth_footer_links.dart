@@ -8,30 +8,33 @@ class AuthFooterLinks extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Wrap(
-      alignment: WrapAlignment.center,
-      crossAxisAlignment: WrapCrossAlignment.center,
-      spacing: 8,
-      runSpacing: 4,
-      children: [
-        _FooterLink(
-          label: 'Terms & Conditions',
-          onTap: () => _showPlaceholder(context, 'Terms & Conditions'),
-          style: TextStyle(fontSize: 12, color: AppColors.textPrimary),
-        ),
-        const Text('•', style: TextStyle(color: AppColors.textPrimary)),
-        _FooterLink(
-          label: 'Privacy Policy',
-          onTap: () => _showPlaceholder(context, 'Privacy Policy'),
-          style: TextStyle(fontSize: 12, color: AppColors.textPrimary),
-        ),
-        const Text('•', style: TextStyle(color: AppColors.textPrimary)),
-        _FooterLink(
-          label: 'Contact Us',
-          onTap: () => _showPlaceholder(context, 'Contact Us'),
-          style: TextStyle(fontSize: 12, color: AppColors.textPrimary),
-        ),
-      ],
+    return Padding(
+      padding: const EdgeInsets.only(top: 8),
+      child: Wrap(
+        alignment: WrapAlignment.center,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        spacing: 8,
+        runSpacing: 4,
+        children: [
+          _FooterLink(
+            label: 'Terms & Conditions',
+            onTap: () => _showPlaceholder(context, 'Terms & Conditions'),
+            style: TextStyle(fontSize: 12, color: AppColors.textPrimary),
+          ),
+          const Text('•', style: TextStyle(color: AppColors.textPrimary)),
+          _FooterLink(
+            label: 'Privacy Policy',
+            onTap: () => _showPlaceholder(context, 'Privacy Policy'),
+            style: TextStyle(fontSize: 12, color: AppColors.textPrimary),
+          ),
+          const Text('•', style: TextStyle(color: AppColors.textPrimary)),
+          _FooterLink(
+            label: 'Contact Us',
+            onTap: () => _showPlaceholder(context, 'Contact Us'),
+            style: TextStyle(fontSize: 12, color: AppColors.textPrimary),
+          ),
+        ],
+      ),
     );
   }
 
