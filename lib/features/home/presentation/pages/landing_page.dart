@@ -5,7 +5,7 @@ import '../../../auth/application/auth_service_contract.dart';
 import '../../../auth/data/models/auth_user.dart';
 import '../../../auth/presentation/pages/login_page.dart';
 import '../widgets/app_layout.dart';
-import 'dashboard_page.dart';
+import 'dashboard/dashboard_page.dart';
 import 'expense_page.dart';
 import 'income_page.dart';
 import 'profile_page.dart';
