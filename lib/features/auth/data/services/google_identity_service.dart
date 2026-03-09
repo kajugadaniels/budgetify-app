@@ -24,6 +24,8 @@ class GoogleIdentityService {
   final GoogleSignIn _googleSignIn;
   bool _isInitialized = false;
 
+  Future<void> ensureInitialized() => _ensureInitialized();
+
   Future<String> getIdToken() async {
     return _getIdToken();
   }
@@ -96,7 +98,7 @@ class GoogleIdentityService {
 
     await _googleSignIn.initialize(
       clientId: _resolveClientId(),
-      serverClientId: AppEnv.googleServerClientId,
+      serverClientId: kIsWeb ? null : AppEnv.googleServerClientId,
     );
 
     _isInitialized = true;
