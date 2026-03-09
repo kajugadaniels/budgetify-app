@@ -14,6 +14,9 @@ class _FakeAuthService implements AuthServiceContract {
   Future<void> clearSession() async {}
 
   @override
+  Future<void> ensureInitialized() async {}
+
+  @override
   Future<void> logout() async {}
 
   @override
@@ -26,6 +29,11 @@ class _FakeAuthService implements AuthServiceContract {
 
   @override
   Future<AuthSession> signInWithGoogle() {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<AuthSession> signInWithGoogleIdToken(String idToken) {
     throw UnimplementedError();
   }
 }
