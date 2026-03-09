@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 abstract final class AppEnv {
@@ -15,7 +16,10 @@ abstract final class AppEnv {
     }
   }
 
-  static String get apiBaseUrl => _normalizeBaseUrl(_require('API_BASE_URL'));
+  static String get apiBaseUrl {
+    final key = kIsWeb ? 'API_BASE_URL_WEB' : 'API_BASE_URL';
+    return _normalizeBaseUrl(_require(key));
+  }
 
   static String get googleServerClientId => _require('GOOGLE_SERVER_CLIENT_ID');
 

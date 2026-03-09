@@ -18,12 +18,17 @@ class ApiClient {
     String path, {
     Map<String, String>? headers,
   }) async {
-    final response = await _httpClient.get(
-      _buildUri(path),
-      headers: _headers(headers),
-    );
-
-    return _decodeResponse(response);
+    try {
+      final response = await _httpClient.get(
+        _buildUri(path),
+        headers: _headers(headers),
+      );
+      return _decodeResponse(response);
+    } on http.ClientException {
+      throw const ApiException(
+        message: 'Unable to reach the server. Check your network connection and ensure the API server is running.',
+      );
+    }
   }
 
   Future<Map<String, dynamic>> postJson(
@@ -31,13 +36,18 @@ class ApiClient {
     Map<String, String>? headers,
     Object? body,
   }) async {
-    final response = await _httpClient.post(
-      _buildUri(path),
-      headers: _headers(headers),
-      body: body == null ? null : jsonEncode(body),
-    );
-
-    return _decodeResponse(response);
+    try {
+      final response = await _httpClient.post(
+        _buildUri(path),
+        headers: _headers(headers),
+        body: body == null ? null : jsonEncode(body),
+      );
+      return _decodeResponse(response);
+    } on http.ClientException {
+      throw const ApiException(
+        message: 'Unable to reach the server. Check your network connection and ensure the API server is running.',
+      );
+    }
   }
 
   Uri _buildUri(String path) {
