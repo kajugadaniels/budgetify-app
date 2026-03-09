@@ -241,27 +241,33 @@ class _ExpenseHeader extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 22),
-          const Wrap(
-            spacing: 12,
-            runSpacing: 12,
+          const Row(
             children: [
-              _MetricChip(
-                icon: HugeIcons.strokeRoundedInvoice01,
-                label: 'Transactions',
-                value: 'Ready to capture',
-                color: AppColors.danger,
+              Expanded(
+                child: _MetricChip(
+                  icon: HugeIcons.strokeRoundedInvoice01,
+                  label: 'Transactions',
+                  value: 'Ready to capture',
+                  color: AppColors.danger,
+                ),
               ),
-              _MetricChip(
-                icon: HugeIcons.strokeRoundedTag01,
-                label: 'Categories',
-                value: 'Prepared',
-                color: AppColors.primary,
+              SizedBox(width: 12),
+              Expanded(
+                child: _MetricChip(
+                  icon: HugeIcons.strokeRoundedTag01,
+                  label: 'Categories',
+                  value: 'Prepared',
+                  color: AppColors.primary,
+                ),
               ),
-              _MetricChip(
-                icon: HugeIcons.strokeRoundedAnalyticsUp,
-                label: 'Spending trends',
-                value: 'Planned',
-                color: AppColors.success,
+              SizedBox(width: 12),
+              Expanded(
+                child: _MetricChip(
+                  icon: HugeIcons.strokeRoundedAnalyticsUp,
+                  label: 'Spending trends',
+                  value: 'Planned',
+                  color: AppColors.success,
+                ),
               ),
             ],
           ),
